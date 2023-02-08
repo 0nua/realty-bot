@@ -1,0 +1,38 @@
+service: realty-bot
+frameworkVersion: '3'
+configValidationMode: error
+useDotenv: true
+
+provider:
+    name: aws
+    runtime: nodejs18.x
+    region: eu-west-3
+    environment:
+        TG_BOT_TOKEN: ${env:TG_BOT_TOKEN}
+        YA_TOKEN: ${env:YA_TOKEN}
+
+plugins:
+    - serverless-offline
+    - serverless-express
+
+functions:
+    link:
+        handler: src/handler/link.handle
+        events:
+            -   http:
+                    method: get
+                    path: /link
+    webhook:
+        handler: src/handler/webhook.handle
+        events:
+            -   http:
+                    method: post
+                    path: /webhook
+    monitor:
+        handler: src/handler/monitor.handle
+        timeout: 30
+        events:
+            -   schedule: rate(30 minutes)
+            -   http:
+                    method: get
+                    path: /monitor
