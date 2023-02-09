@@ -16,9 +16,14 @@ class Collector {
 
     async getData() {
         let result = {};
+        let promises = [];
+
         for (let provider of this.providers) {
-            result = lodash.merge(result, await provider.getData());
+            let promise = provider.getData().then(data => result = lodash.merge(result, data));
+            promises.push(promise);
         }
+
+        await Promise.all(promises);
 
         let newest = [];
         let collection = await this.yaDisk.get();
