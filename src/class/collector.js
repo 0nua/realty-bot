@@ -17,7 +17,6 @@ class Collector {
     async getData() {
         let result = {};
         let promises = [];
-
         for (let provider of this.providers) {
             let promise = provider.getData().then(data => result = lodash.merge(result, data));
             promises.push(promise);
