@@ -5,6 +5,7 @@ jspm_packages
 #directories
 .serverless
 .idea
+dist
 
 #files
 .env

@@ -17,19 +17,19 @@ plugins:
 
 functions:
     link:
-        handler: src/handler/link.handle
+        handler: dist/handler/link.handle
         events:
             -   http:
                     method: get
                     path: /link
     webhook:
-        handler: src/handler/webhook.handle
+        handler: dist/handler/webhook.handle
         events:
             -   http:
                     method: post
                     path: /webhook
     monitor:
-        handler: src/handler/monitor.handle
+        handler: dist/handler/monitor.handle
         timeout: 30
         events:
             -   schedule: rate(30 minutes)
