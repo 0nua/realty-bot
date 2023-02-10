@@ -1,1 +1,1 @@
-declare module "serverless-express"
+declare module 'serverless-express/express';

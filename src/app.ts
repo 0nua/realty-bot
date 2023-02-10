@@ -1,4 +1,4 @@
-import express from "serverless-express";
+import express from 'serverless-express/express';
 const TgBot = require('./class/tgBot');
 
 const app = express();

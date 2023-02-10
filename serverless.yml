@@ -11,6 +11,11 @@ provider:
         TG_BOT_TOKEN: ${env:TG_BOT_TOKEN}
         YA_TOKEN: ${env:YA_TOKEN}
 
+package:
+    patterns:
+        - '!src/**'
+        - '!types/**'
+
 plugins:
     - serverless-offline
     - serverless-express
