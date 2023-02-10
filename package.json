@@ -5,7 +5,8 @@
     "scripts": {
         "build": "npm install",
         "start": "tsc && serverless offline",
-        "deploy": "tsc && serverless deploy"
+        "deploy": "tsc && serverless deploy",
+        "compile": "tsc"
     },
     "keywords": [],
     "author": "Vladimir Prisada",
@@ -19,6 +20,7 @@
     },
     "devDependencies": {
         "typescript": "^4.9.5",
+        "@types/node": "^18.13.0",
         "serverless": "^3.27.0",
         "serverless-dotenv-plugin": "^4.0.2",
         "serverless-offline": "^12.0.4"

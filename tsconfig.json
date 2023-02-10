@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",
-    "sourceMap": false,
     "outDir": "./dist",
     "alwaysStrict": true,
     "allowJs": true,
@@ -14,6 +13,5 @@
   },
   "include": [
     "src/**/*",
-    "types/*"
   ],
 }

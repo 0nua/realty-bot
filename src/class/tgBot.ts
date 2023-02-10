@@ -1,21 +1,25 @@
-const { Markup, Telegraf } = require('telegraf');
-const fs = require('fs');
+import { Markup, Telegraf, Context } from 'telegraf';
+import fs from 'fs';
 const YaDisk = require('./yaDisk');
 const Collector = require('./collector');
 
-class TgBot {
+export default class TgBot {
+    bot: Telegraf;
+    yaDisk: typeof YaDisk;
+    collector: typeof Collector;
+
     constructor() {
         this.yaDisk = new YaDisk('realty-bot/config.json');
         this.collector = new Collector();
-        this.bot = new Telegraf(process.env.TG_BOT_TOKEN || null);
+        this.bot = new Telegraf(process.env.TG_BOT_TOKEN || 'null');
         this.init();
     }
 
-    async process(req) {
+    async process(req: any) {
         return await this.bot.handleUpdate(req.body);
     }
 
-    setWebhook(req) {
+    setWebhook(req: any) {
         let event = req.apiGateway.event;
         let link = `https://${event.requestContext.domainName}/dev/webhook`;
         return this.bot.telegram.setWebhook(link);
@@ -54,11 +58,9 @@ class TgBot {
             await ctx.reply(`Keep calm and relax! Your chat id ${ctx.chat.id}. Settings: ${JSON.stringify(settings)}`);
         });
 
-        this.bot.catch((err, ctx) => {
+        this.bot.catch((err: any, ctx: Context) => {
             console.log(err);
             ctx.reply(`Something went wrong. Try again. Error: ${err.message}`);
         });
     }
 }
-
-module.exports = TgBot;
