@@ -3,8 +3,8 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "build": "npm install && tsc",
-        "start": "serverless offline",
+        "build": "npm install",
+        "start": "tsc && serverless offline",
         "deploy": "tsc && serverless deploy"
     },
     "keywords": [],
