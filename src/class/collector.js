@@ -2,6 +2,7 @@ const YaDisk = require('./yaDisk');
 const lodash = require('lodash');
 const Ingatlan = require('../provider/ingatlan');
 const RentWithPaws = require('../provider/rentWithPaws');
+const Alberlet = require('../provider/alberlet');
 
 class Collector {
     constructor() {
@@ -10,6 +11,8 @@ class Collector {
         this.providers = [
             new Ingatlan(['rent', 'house', 'pets', 'location', 'price']),
             new Ingatlan(['rent', 'flat', 'newly', 'balcony', 'pets', 'location', 'price', 'rooms']),
+            new Alberlet(['rent', 'house', 'pets', 'location', 'price']),
+            new Alberlet(['rent', 'flat', 'newly', 'balcony', 'pets', 'location', 'price', 'rooms']),
             new RentWithPaws(),
         ];
     }

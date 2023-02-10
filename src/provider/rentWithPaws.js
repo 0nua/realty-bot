@@ -5,7 +5,6 @@ class RentWithPaws extends Base {
     constructor() {
         super();
 
-        this.url = 'https://tappancsosotthon.hu/';
         this.selector = 'div.property-item';
     }
 
@@ -22,6 +21,10 @@ class RentWithPaws extends Base {
             price: card.querySelector('div.property-price > span').text.trim(),
             address: link.text.trim(),
         };
+    }
+
+    getUrl(page) {
+        return 'https://tappancsosotthon.hu/';
     }
 
 }

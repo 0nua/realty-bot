@@ -16,7 +16,7 @@ class Base {
         let listings = [];
 
         do {
-            let response = await axios.get(`${this.url}?page=${page}`);
+            let response = await axios.get(this.getUrl(page));
 
             let dom = parser.parse(response.data);
             listings = dom.querySelectorAll(this.selector);
@@ -38,8 +38,12 @@ class Base {
         return result;
     }
 
+    getUrl(page) {
+        throw new Error('Not implemented');
+    }
+
     parse(card) {
-        return {};
+        throw new Error('Not implemented');
     }
 
 }

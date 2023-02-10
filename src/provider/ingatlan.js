@@ -5,12 +5,12 @@ class Ingatlan extends Base {
     constructor(filters) {
         super();
 
-        this.url = this.getUrlWithFilters(filters);
+        this.filters = filters;
         this.selector = 'div.listing';
         this.withPages = true;
     }
 
-    getUrlWithFilters(filters) {
+    getUrl(page) {
         let filterMap = {
             pets: 'kisallat-hozhato',
             house: 'haz',
@@ -23,7 +23,8 @@ class Ingatlan extends Base {
             balcony: '1-m2erkely-felett',
         };
 
-        return `https://realestatehungary.hu/szukites/${filters.map(filter => filterMap[filter] || 'undefined').join('+')}`;
+        let filtersUrl = this.filters.map(filter => filterMap[filter] || 'undefined').join('+');
+        return `https://realestatehungary.hu/szukites/${filtersUrl}?page=${page}`;
     }
 
     parse(card) {
