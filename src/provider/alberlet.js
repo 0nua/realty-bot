@@ -28,7 +28,7 @@ class Alberlet extends Base {
 
     parse(card) {
         return {
-            id: `https://en.alberlet.hu/${card.querySelector('> a').getAttribute('href')}`,
+            id: `https://en.alberlet.hu${card.querySelector('> a').getAttribute('href')}`,
             price: card.querySelector('div.col').text.trim(),
             address: card.querySelector('div.address').text.trim().replace('Budapest', ''),
         }
