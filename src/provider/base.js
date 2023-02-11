@@ -16,10 +16,13 @@ class Base {
         let listings = [];
 
         do {
-            let response = await axios.get(this.getUrl(page));
+            let url = this.getUrl(page);
+            let response = await axios.get(url);
 
             let dom = parser.parse(response.data);
             listings = dom.querySelectorAll(this.selector);
+
+            console.log({url: url, count: listings.length});
 
             if (listings.length > 0) {
                 listings.forEach(card => {
