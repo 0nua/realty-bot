@@ -15,17 +15,25 @@ export default class TgBot {
         this.init();
     }
 
-    async process(req: any) {
+    /**
+     * Process bot mesages
+     * @param req
+     */
+    async process(req: any): Promise<any> {
         return await this.bot.handleUpdate(req.body);
     }
 
-    setWebhook(req: any) {
+    /**
+     * Set webhook
+     * @param req
+     */
+    setWebhook(req: any): Promise<boolean> {
         let event = req.apiGateway.event;
         let link = `https://${event.requestContext.domainName}/dev/webhook`;
         return this.bot.telegram.setWebhook(link);
     }
 
-    async checkUpdates() {
+    async checkUpdates(): Promise<object> {
         let settings = await this.yaDisk.get();
         let data = await this.collector.getData();
         if (!settings.chatIds || settings.chatIds.length === 0) {
@@ -47,7 +55,7 @@ export default class TgBot {
         return data;
     }
 
-    init() {
+    init(): void {
         this.bot.start(async ctx => {
             await this.yaDisk.update({ chatIds: [ctx.chat.id] }, true);
             await ctx.reply('Nice to meet you! Enjoy!');
