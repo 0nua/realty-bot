@@ -1,8 +1,10 @@
-const Base = require('./base');
+import Base from "./base";
 
-class Alberlet extends Base {
+export class Alberlet extends Base {
 
-    constructor(filters) {
+    filters: string[];
+
+    constructor(filters: string[]) {
         super();
 
         this.filters = filters;
@@ -10,7 +12,7 @@ class Alberlet extends Base {
         this.withPages = true;
     }
 
-    getUrl(page) {
+    getUrl(page: number) {
         let filterMap = {
             pets: 'haziallat-engedelyezve:igen',
             house: 'ingatlan-tipus:haz',
@@ -22,11 +24,11 @@ class Alberlet extends Base {
             newly: 'ujszeru:igen'
         };
 
-        let filtersUrl = this.filters.map(filter => filterMap[filter] || 'undefined').join('/');
+        let filtersUrl = this.filters.map((filter) => filterMap[filter] || 'undefined').join('/');
         return `https://en.alberlet.hu/kiado_alberlet/page:${page}/${filtersUrl}`;
     }
 
-    parse(card) {
+    parse(card: any) {
         return {
             id: `https://en.alberlet.hu${card.querySelector('> a').getAttribute('href')}`,
             price: card.querySelector('div.col').text.trim(),
@@ -35,5 +37,3 @@ class Alberlet extends Base {
     }
 
 }
-
-module.exports = Alberlet;

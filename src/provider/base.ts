@@ -1,8 +1,19 @@
-const axios = require('axios');
-const parser = require('node-html-parser');
-const crypto = require('crypto');
+import RequestWrapper from "../class/requestWrapper";
+import axios from 'axios';
+import parser from 'node-html-parser';
+import crypto from 'crypto';
 
-class Base {
+interface Item {
+    id: string,
+    price: string,
+    address: string
+}
+
+export default class Base {
+
+    url: string;
+    selector: string;
+    withPages: boolean;
 
     constructor() {
         this.url = '';
@@ -17,12 +28,12 @@ class Base {
 
         do {
             let url = this.getUrl(page);
-            let response = await axios.get(url);
+            let response = await RequestWrapper.request(() => axios.get(url));
 
             let dom = parser.parse(response.data);
             listings = dom.querySelectorAll(this.selector);
 
-            console.log({url: url, count: listings.length});
+            console.log({url: url, count: listings.length, time: response.time});
 
             if (listings.length > 0) {
                 listings.forEach(card => {
@@ -41,14 +52,12 @@ class Base {
         return result;
     }
 
-    getUrl(page) {
+    getUrl(page: number): string {
         throw new Error('Not implemented');
     }
 
-    parse(card) {
+    parse(card: any): Item | null {
         throw new Error('Not implemented');
     }
 
 }
-
-module.exports = Base;

@@ -1,8 +1,8 @@
 const YaDisk = require('./yaDisk');
 const lodash = require('lodash');
-const Ingatlan = require('../provider/ingatlan');
-const RentWithPaws = require('../provider/rentWithPaws');
-const Alberlet = require('../provider/alberlet');
+const { Ingatlan } = require('../provider/ingatlan');
+const { RentWithPaws } = require('../provider/rentWithPaws');
+const { Alberlet } = require('../provider/alberlet');
 
 class Collector {
     constructor() {

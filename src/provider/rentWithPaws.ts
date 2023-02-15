@@ -1,6 +1,6 @@
-const Base = require('./base');
+import Base from './base';
 
-class RentWithPaws extends Base {
+export class RentWithPaws extends Base {
 
     constructor() {
         super();
@@ -8,7 +8,7 @@ class RentWithPaws extends Base {
         this.selector = 'div.property-item';
     }
 
-    parse(card) {
+    parse(card: any) {
         let link = card.querySelector('.property-title > a');
 
         let date = card.querySelector('.property-date').text;
@@ -23,10 +23,8 @@ class RentWithPaws extends Base {
         };
     }
 
-    getUrl(page) {
+    getUrl(page: number) {
         return 'https://tappancsosotthon.hu/';
     }
 
 }
-
-module.exports = RentWithPaws;

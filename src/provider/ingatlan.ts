@@ -1,8 +1,10 @@
-const Base = require('./base');
+import Base from './base';
 
-class Ingatlan extends Base {
+export class Ingatlan extends Base {
 
-    constructor(filters) {
+    filters: string[];
+
+    constructor(filters: string[]) {
         super();
 
         this.filters = filters;
@@ -10,7 +12,7 @@ class Ingatlan extends Base {
         this.withPages = true;
     }
 
-    getUrl(page) {
+    getUrl(page: number) {
         let filterMap = {
             pets: 'kisallat-hozhato',
             house: 'haz',
@@ -27,7 +29,7 @@ class Ingatlan extends Base {
         return `https://realestatehungary.hu/szukites/${filtersUrl}?page=${page}`;
     }
 
-    parse(card) {
+    parse(card: any) {
         return {
             id: `https://realestatehungary.hu${card.querySelector('.listing__link').getAttribute('href')}`,
             price: card.querySelector('div.price').text.trim(),
@@ -35,5 +37,3 @@ class Ingatlan extends Base {
         };
     }
 }
-
-module.exports = Ingatlan;
