@@ -1,9 +1,11 @@
-const axios = require('axios');
-const lodash = require('lodash');
+import axios from 'axios';
+import lodash from 'lodash';
 
-class YaDisk {
+export default class YaDisk {
+    path: string;
+    config: object;
 
-    constructor(path) {
+    constructor(path: string) {
         this.path = path;
         this.config = {
             headers: {
@@ -12,7 +14,7 @@ class YaDisk {
         };
     }
 
-    async get() {
+    async get(): Promise<any> {
         try {
             let response = await axios.get(
                 `https://cloud-api.yandex.net/v1/disk/resources/download?path=${this.path}`,
@@ -26,18 +28,18 @@ class YaDisk {
         }
     }
 
-    download(url) {
+    download(url: string): Promise<string> {
         return new Promise(async (resolve, reject) => {
             let response = await axios.get(url, { responseType: 'stream' });
             let stream = response.data;
             let content = '';
-            stream.on('data', data => content += data);
+            stream.on('data', (data: string) => content += data);
             stream.on('end', () => resolve(content));
-            stream.on('error', (err) => reject(err));
+            stream.on('error', (err: Error) => reject(err));
         });
     }
 
-    async update(data, merge = false) {
+    async update(data: object, merge = false): Promise<boolean> {
         try {
             if (merge) {
                 let old = await this.get();
@@ -78,5 +80,3 @@ class YaDisk {
     }
 
 }
-
-module.exports = YaDisk;

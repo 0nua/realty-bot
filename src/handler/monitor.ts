@@ -1,13 +1,13 @@
-const app = require('../app');
+import app from '../app';
 
-module.exports.handle = async (event) => {
+let handle = async (event: any) => {
     try {
         let data = await app.tgBot.checkUpdates();
         return {
             statusCode: 200,
             body: JSON.stringify(data.result),
         };
-    } catch (err) {
+    } catch (err: any) {
         console.error(err);
         return {
             statusCode: 500,
@@ -15,3 +15,5 @@ module.exports.handle = async (event) => {
         };
     }
 };
+
+export {handle}

@@ -1,12 +1,14 @@
 import { Markup, Telegraf, Context } from 'telegraf';
 import fs from 'fs';
-const YaDisk = require('./yaDisk');
-const Collector = require('./collector');
+import YaDisk from './yaDisk';
+import Collector from './collector';
+import Settings from "../interfaces/settings";
+import Data from "../interfaces/collectorData";
 
 export default class TgBot {
     bot: Telegraf;
-    yaDisk: typeof YaDisk;
-    collector: typeof Collector;
+    yaDisk: YaDisk;
+    collector: Collector;
 
     constructor() {
         this.yaDisk = new YaDisk('realty-bot/config.json');
@@ -33,8 +35,8 @@ export default class TgBot {
         return this.bot.telegram.setWebhook(link);
     }
 
-    async checkUpdates(): Promise<object> {
-        let settings = await this.yaDisk.get();
+    async checkUpdates(): Promise<Data> {
+        let settings: Settings = await this.yaDisk.get();
         let data = await this.collector.getData();
         if (!settings.chatIds || settings.chatIds.length === 0) {
             return data;

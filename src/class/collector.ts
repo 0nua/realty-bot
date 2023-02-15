@@ -1,10 +1,17 @@
-const YaDisk = require('./yaDisk');
-const lodash = require('lodash');
-const { Ingatlan } = require('../provider/ingatlan');
-const { RentWithPaws } = require('../provider/rentWithPaws');
-const { Alberlet } = require('../provider/alberlet');
+import YaDisk from './yaDisk';
+import lodash from 'lodash';
+import Base from '../provider/base';
+import { Ingatlan } from '../provider/ingatlan';
+import { RentWithPaws } from '../provider/rentWithPaws';
+import { Alberlet } from '../provider/alberlet';
+import Item from '../interfaces/providerItem';
+import Data from '../interfaces/collectorData';
 
-class Collector {
+export default class Collector {
+
+    yaDisk: YaDisk;
+    providers: Base[]
+
     constructor() {
         this.yaDisk = new YaDisk('/realty-bot/collection.json');
 
@@ -17,7 +24,7 @@ class Collector {
         ];
     }
 
-    async getData() {
+    async getData(): Promise<Data> {
         let result = {};
         let promises = [];
         for (let provider of this.providers) {
@@ -27,7 +34,7 @@ class Collector {
 
         await Promise.all(promises);
 
-        let newest = [];
+        let newest: Item[] = [];
         let collection = await this.yaDisk.get();
         Object.keys(result).forEach(id => {
             if (collection.hasOwnProperty(id)) {
@@ -50,5 +57,3 @@ class Collector {
         };
     }
 }
-
-module.exports = Collector;

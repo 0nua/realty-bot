@@ -1,15 +1,17 @@
 const handler = require('serverless-express/handler');
-const app = require('../app');
+import app from '../app';
 
-app.get('/link', (req, res) => {
+app.get('/link', (req: any, res: any) => {
     return app.tgBot.setWebhook(req)
-        .then((result) => {
+        .then((result: boolean) => {
             return res.send(`Success: ${result}`);
-        }).catch(err => {
+        }).catch((err: Error) => {
             console.error(err);
             return res.status(500)
                 .send(`Failed: ${err.message}`);
         });
 });
 
-module.exports.handle = handler(app);
+let handle = handler(app);
+
+export {handle}

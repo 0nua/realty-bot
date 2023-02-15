@@ -2,12 +2,7 @@ import RequestWrapper from "../class/requestWrapper";
 import axios from 'axios';
 import parser from 'node-html-parser';
 import crypto from 'crypto';
-
-interface Item {
-    id: string,
-    price: string,
-    address: string
-}
+import Item from '../interfaces/providerItem'
 
 export default class Base {
 
