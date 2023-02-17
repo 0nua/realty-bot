@@ -20,6 +20,7 @@ export default class Base {
         let result = {};
         let page = 1;
         let listings = [];
+        let log = [];
 
         do {
             let url = this.getUrl(page);
@@ -28,21 +29,24 @@ export default class Base {
             let dom = parser.parse(response.data);
             listings = dom.querySelectorAll(this.selector);
 
-            console.log({url: url, count: listings.length, time: response.time});
+            log.push({url: url, count: listings.length, time: response.time});
 
             if (listings.length > 0) {
-                listings.forEach(card => {
-                    let data = this.parse(card);
+                for (let index = 0; index < listings.length; index++) {
+                    let data = this.parse(listings[index]);
                     if (data === null) {
-                        return;
+                        continue;
                     }
+
                     let key = crypto.createHash('md5').update(data.id).digest('hex');
 
                     result[key] = data;
-                });
-                page++;
+                }
             }
+            page++
         } while (this.withPages && listings.length !== 0);
+
+        console.log(log);
 
         return result;
     }

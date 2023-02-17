@@ -37,44 +37,34 @@ export default class TgBot {
 
     async getChatId(settings: Settings): Promise<number> {
         let array = [];
-        for (let userId in settings) {
-            if (userId === 'chatIds') {
+        for (let chatId in settings) {
+            if (chatId === 'chatIds') {
                 continue;
             }
 
-            let data = settings[userId];
-
+            let data = settings[chatId];
             array.push(
                 {
-                    id: userId,
+                    id: chatId,
                     lastDate: data.lastDate
                 }
             );
         }
 
-        let neverUsed = array.filter((item) => item.lastDate === undefined);
-        if (neverUsed.length > 0) {
-            array = neverUsed;
-        } else {
-            array.sort((a: any, b: any) => {
-                if (a.lastDate > b.lastDate) {
-                    return -1;
-                }
+        let chat = array.sort((a: any, b: any) => {
+            if (a.lastDate > b.lastDate) {
+                return -1;
+            }
 
-                return a.lastDate < b.lastDate ? 1 : 0;
-            });
+            return a.lastDate < b.lastDate ? 1 : 0;
+        }).pop();
+
+        let id = chat ? Number.parseInt(chat.id) : 0;
+
+        if (id > 0) {
+            settings[id].lastDate = (new Date()).getTime();
+            await this.yaDisk.update(settings);
         }
-
-        let user = array.pop();
-
-        let id = user ? Number.parseInt(user.id) : 0;
-
-        await this.yaDisk.update(
-            {
-                [id]: {lastDate: (new Date()).getTime()}
-            },
-            true
-        )
 
         return id;
     }
@@ -98,29 +88,6 @@ export default class TgBot {
         );
 
         return data;
-    }
-
-    async getFilters(chatId: number, settings: Settings | null = null, selectedType: string | null = null) {
-        if (settings === null) {
-            settings = await this.yaDisk.get();
-        }
-
-        let filters = settings && settings[chatId]?.filters || {};
-
-        let keyboard = [];
-        for (let type in filters) {
-            if (selectedType !== null && type !== selectedType) {
-                continue;
-            }
-            for (let index in filters[type]) {
-                let item = filters[type][index];
-                keyboard.push(
-                    [Markup.button.callback(`${type}: ${item}`, `delete-${type}-${item}`)]
-                );
-            }
-        }
-
-        return keyboard;
     }
 
     getFiltersKeyboard(type: string, filters: Filters): any {

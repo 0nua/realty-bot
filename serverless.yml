@@ -34,7 +34,7 @@ functions:
                     path: /webhook
     monitor:
         handler: dist/handler/monitor.handle
-        timeout: 30
+        timeout: 300
         events:
             -   schedule: rate(5 minutes)
             -   http:

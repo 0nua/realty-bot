@@ -42,9 +42,9 @@ export default class Collector {
         await Promise.all(promises);
 
         let newest: Item[] = [];
-        let collection = await this.yaDisk.get();
+        let collection = await this.yaDisk.get([]);
         Object.keys(result).forEach(id => {
-            if (collection.hasOwnProperty(id)) {
+            if (collection.indexOf(id) !== -1) {
                 return;
             }
 
@@ -56,7 +56,7 @@ export default class Collector {
             newest = [];
         }
 
-        await this.yaDisk.update(result);
+        await this.yaDisk.update(Object.keys(result));
 
         return {
             result,

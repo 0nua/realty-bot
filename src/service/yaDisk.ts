@@ -1,5 +1,4 @@
 import axios from 'axios';
-import lodash from 'lodash';
 
 export default class YaDisk {
     path: string;
@@ -14,7 +13,7 @@ export default class YaDisk {
         };
     }
 
-    async get(): Promise<any> {
+    async get(def:any = {}): Promise<any> {
         try {
             let response = await axios.get(
                 `https://cloud-api.yandex.net/v1/disk/resources/download?path=${this.path}`,
@@ -24,7 +23,7 @@ export default class YaDisk {
             return JSON.parse(content);
         } catch (err) {
             console.log(err);
-            return {};
+            return def;
         }
     }
 
@@ -39,17 +38,8 @@ export default class YaDisk {
         });
     }
 
-    async update(data: object, merge = false): Promise<boolean> {
+    async update(data: object): Promise<boolean> {
         try {
-            if (merge) {
-                let old = await this.get();
-                data = lodash.mergeWith({}, old, data, (a, b) => {
-                    if (lodash.isArray(a)) {
-                        return lodash.uniq(b.concat(a));
-                    }
-                });
-            }
-
             let upload = await axios.get(
                 `https://cloud-api.yandex.net/v1/disk/resources/upload?overwrite=true&path=${this.path}`,
                 this.config,
