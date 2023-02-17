@@ -1,6 +1,6 @@
 export interface Filters {
-    flat: string[] | null,
-    house: string[] | null,
+    flat: string[],
+    house: string[],
 }
 
 export interface Settings {

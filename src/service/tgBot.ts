@@ -202,11 +202,11 @@ export default class TgBot {
             let filters = settings[ctx.chat.id].filters[type] || [];
 
             if (name.includes('room')) {
-                filters = filters.filter((item: string) => !item.includes('room'));
+                filters = filters.filter((item: string) => !item.includes('room') || item === name);
             }
 
             if (name.includes('price')) {
-                filters = filters.filter((item: string) => !item.includes('price'));
+                filters = filters.filter((item: string) => !item.includes('price') || item === name);
             }
 
             if (filters.indexOf(name) === -1) {
@@ -217,13 +217,20 @@ export default class TgBot {
 
             settings[ctx.chat.id].filters[type] = filters;
 
+            let houseFilters = settings[ctx.chat.id].filters.house;
+            let flatFilters = settings[ctx.chat.id].filters.flat;
+
+            if (houseFilters.length === 0 && flatFilters.length === 0) {
+                delete settings[ctx.chat.id];
+            }
+
             await this.yaDisk.update(settings);
 
             await this.yaDisk.delete(`/realty-bot/collection_${ctx.chat.id}.json`);
 
             await ctx.editMessageReplyMarkup(
                 {
-                    inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id].filters)
+                    inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
                 }
             );
         });
