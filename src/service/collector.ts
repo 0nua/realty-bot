@@ -6,13 +6,14 @@ import { RentWithPaws } from '../provider/rentWithPaws';
 import { Alberlet } from '../provider/alberlet';
 import Item from '../interfaces/providerItem';
 import Data from '../interfaces/collectorData';
+import {Filters} from "../interfaces/settings";
 
 export default class Collector {
 
     yaDisk: YaDisk;
     providers: Base[]
 
-    constructor(chatId: number, filters: object) {
+    constructor(chatId: number, filters: Filters) {
         this.yaDisk = new YaDisk(`/realty-bot/collection_${chatId}.json`);
 
         this.providers = [new RentWithPaws()];

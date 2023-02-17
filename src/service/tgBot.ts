@@ -2,7 +2,7 @@ import {Markup, Telegraf} from 'telegraf';
 import fs from 'fs';
 import YaDisk from './yaDisk';
 import Collector from './collector';
-import Settings from "../interfaces/settings";
+import {Settings} from "../interfaces/settings";
 import Data from "../interfaces/collectorData";
 
 export default class TgBot {
@@ -63,13 +63,9 @@ export default class TgBot {
             });
         }
 
-        console.log(array);
-
         let user = array.pop();
 
         let id = user ? Number.parseInt(user.id) : 0;
-
-        console.log(id);
 
         await this.yaDisk.update(
             {
@@ -142,9 +138,12 @@ export default class TgBot {
 
         this.bot.command('stop', async ctx => {
             let settings: Settings = await this.yaDisk.get();
-            settings.chatIds = settings.chatIds.filter((id: number) => id !== ctx.chat.id);
+
+            delete settings[ctx.chat.id];
+
             await this.yaDisk.update(settings);
-            await ctx.reply('Goodbye!');
+
+            await ctx.reply('Subscribe was rejected! Goodbye!');
         });
 
         this.bot.action('flat', ctx => {
@@ -183,7 +182,12 @@ export default class TgBot {
 
             let type = ctx.match[1];
             let name = ctx.match[2];
-            let filters = settings[ctx.chat.id].filters[type] || {};
+
+            if (settings.hasOwnProperty(ctx.chat.id) === false) {
+                settings[ctx.chat.id] = {filters: {house: [], flat: []}, lastDate: (new Date()).getTime()};
+            }
+
+            let filters = settings[ctx.chat.id].filters[type] || [];
 
             if (name.includes('room')) {
                 filters = filters.filter((item: string) => !item.includes('room'));
@@ -207,8 +211,9 @@ export default class TgBot {
             let settings: Settings = await this.yaDisk.get();
             let type = ctx.match[1];
             let name = ctx.match[2];
+            let filters = settings[ctx.chat.id].filters;
 
-            settings[ctx.chat.id].filters[type] = settings[ctx.chat.id].filters[type].filter((item: string) => item !== name);
+            settings[ctx.chat.id].filters[type] = filters[type].filter((item: string) => item !== name);
 
             await this.yaDisk.update(settings);
 
