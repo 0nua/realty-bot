@@ -17,16 +17,23 @@ export class Ingatlan extends Base {
             pets: 'kisallat-hozhato',
             house: 'haz',
             flat: 'lakas',
-            rent: 'kiado',
             newly: 'uj-epitesu',
             location: 'budapest',
-            rooms: '2-szoba-felett',
+            room: 'szoba-felett',
             price: 'havi-600-ezer-Ft-ig',
             balcony: '1-m2erkely-felett',
         };
 
-        let filtersUrl = this.filters.map(filter => filterMap[filter] || 'undefined').join('+');
-        return `https://realestatehungary.hu/szukites/${filtersUrl}?page=${page}`;
+        let filtersUrl = this.filters.map(
+            (filter) => {
+                if (filter.includes('room')) {
+                    let [, count] = filter.split('-');
+                    return `${count}-${filterMap.room}`;
+                }
+                return filterMap[filter] || 'undefined';
+            }
+        ).join('+');
+        return `https://realestatehungary.hu/szukites/kiado+${filtersUrl}?page=${page}`;
     }
 
     parse(card: any) {

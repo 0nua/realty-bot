@@ -1,4 +1,4 @@
-import RequestWrapper from "../class/requestWrapper";
+import RequestWrapper from "../service/requestWrapper";
 import axios from 'axios';
 import parser from 'node-html-parser';
 import crypto from 'crypto';

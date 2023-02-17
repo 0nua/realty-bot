@@ -18,13 +18,21 @@ export class Alberlet extends Base {
             house: 'ingatlan-tipus:haz',
             flat: 'ingatlan-tipus:lakas',
             location: 'megye:budapest',
-            rooms: 'szoba:2-4',
+            room: 'szoba',
             price: 'berleti-dij:0-600-ezer-ft',
             balcony: 'erkely:igen',
             newly: 'ujszeru:igen'
         };
 
-        let filtersUrl = this.filters.map((filter) => filterMap[filter] || 'undefined').join('/');
+        let filtersUrl = this.filters.map(
+            (filter) => {
+                if (filter.includes('room')) {
+                    let [, count] = filter.split('-');
+                    return `${filterMap.room}:${count}-x`;
+                }
+                return filterMap[filter] || 'undefined';
+            }
+        ).join('/');
         return `https://en.alberlet.hu/kiado_alberlet/page:${page}/${filtersUrl}`;
     }
 

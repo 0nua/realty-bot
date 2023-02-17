@@ -12,16 +12,19 @@ export default class Collector {
     yaDisk: YaDisk;
     providers: Base[]
 
-    constructor() {
-        this.yaDisk = new YaDisk('/realty-bot/collection.json');
+    constructor(chatId: number, filters: object) {
+        this.yaDisk = new YaDisk(`/realty-bot/collection_${chatId}.json`);
 
-        this.providers = [
-            new Ingatlan(['rent', 'house', 'pets', 'location', 'price']),
-            new Ingatlan(['rent', 'flat', 'newly', 'balcony', 'pets', 'location', 'price', 'rooms']),
-            new Alberlet(['house', 'pets', 'location', 'price']),
-            new Alberlet(['flat', 'newly', 'balcony', 'pets', 'location', 'price', 'rooms']),
-            new RentWithPaws(),
-        ];
+        this.providers = [new RentWithPaws()];
+
+        for (let type in filters) {
+            let values = filters[type];
+            values.push(type);
+            values.push('location');
+
+            this.providers.push(new Ingatlan(values));
+            this.providers.push(new Alberlet(values));
+        }
     }
 
     async getData(): Promise<Data> {
