@@ -19,7 +19,7 @@ export default class Collector {
         this.providers = [new RentWithPaws()];
 
         for (let type in filters) {
-            let values = filters[type];
+            let values = [...filters[type]];
             if (values.length === 0) {
                 continue;
             }

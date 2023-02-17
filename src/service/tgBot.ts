@@ -267,7 +267,7 @@ export default class TgBot {
 
         this.bot.catch((err: any, ctx: any) => {
             console.log(err);
-            ctx.reply(`Something went wrong. Try again. Error: ${err.message}`);
+            ctx.reply(`Something went wrong. Please, try again`);
         });
     }
 }
