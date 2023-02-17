@@ -123,6 +123,26 @@ export default class TgBot {
         await ctx.reply('This is your filters, click if would like to remove any', Markup.inlineKeyboard(keyboard));
     }
 
+    getFiltersKeyboard(type: string): any {
+        let keyboard = [
+            [Markup.button.callback('Only new buildings', `filter-${type}-newly`)],
+            [Markup.button.callback('With pets', `filter-${type}-pets`)],
+            [Markup.button.callback('Min. 2 rooms', `filter-${type}-room-2`)],
+            [Markup.button.callback('Min. 3 rooms', `filter-${type}-room-3`)],
+            [Markup.button.callback('Min. 4 rooms', `filter-${type}-room-4`)],
+            [Markup.button.callback('Min. 100th Ft/month', `filter-${type}-price-100`)],
+            [Markup.button.callback('Min. 300th Ft/month', `filter-${type}-price-300`)],
+            [Markup.button.callback('Min. 500th Ft/month', `filter-${type}-price-500`)],
+            [Markup.button.callback('Min. 700th Ft/month', `filter-${type}-price-700`)],
+        ];
+
+        if (type === 'flat') {
+            keyboard.push([Markup.button.callback('With balcony', `filter-${type}-balcony`)]);
+        }
+
+        return keyboard;
+    }
+
     init(): void {
         this.bot.command(['start', 'configure'], async ctx => {
             await ctx.reply(
@@ -149,39 +169,14 @@ export default class TgBot {
         this.bot.action('flat', ctx => {
             ctx.reply(
                 'Okay, you need a flat, may be some details?!',
-                Markup.inlineKeyboard(
-                    [
-                        [Markup.button.callback('Only new buildings', 'filter-flat-newly')],
-                        [Markup.button.callback('With balcony', 'filter-flat-balcony')],
-                        [Markup.button.callback('With pets', 'filter-flat-pets')],
-                        [Markup.button.callback('Min. 2 rooms', 'filter-flat-room-2')],
-                        [Markup.button.callback('Min. 3 rooms', 'filter-flat-room-3')],
-                        [Markup.button.callback('Min. 4 rooms', 'filter-flat-room-4')],
-                        [Markup.button.callback('Min. 100th Ft/month', 'filter-flat-price-100')],
-                        [Markup.button.callback('Min. 300th Ft/month', 'filter-flat-price-300')],
-                        [Markup.button.callback('Min. 500th Ft/month', 'filter-flat-price-500')],
-                        [Markup.button.callback('Min. 700th Ft/month', 'filter-flat-price-700')],
-                    ]
-                )
+                Markup.inlineKeyboard(this.getFiltersKeyboard('flat'))
             )
         });
 
         this.bot.action('house', ctx => {
             ctx.reply(
                 'Okay, you need a house, may be some details?!',
-                Markup.inlineKeyboard(
-                    [
-                        [Markup.button.callback('Only new buildings', 'filter-house-newly')],
-                        [Markup.button.callback('With pets', 'filter-house-pets')],
-                        [Markup.button.callback('Min. 2 rooms', 'filter-house-room-2')],
-                        [Markup.button.callback('Min. 3 rooms', 'filter-house-room-3')],
-                        [Markup.button.callback('Min. 4 rooms', 'filter-house-room-4')],
-                        [Markup.button.callback('Min. 100th Ft/month', 'filter-house-price-100')],
-                        [Markup.button.callback('Min. 300th Ft/month', 'filter-house-price-300')],
-                        [Markup.button.callback('Min. 500th Ft/month', 'filter-house-price-500')],
-                        [Markup.button.callback('Min. 700th Ft/month', 'filter-house-price-700')],
-                    ]
-                )
+                Markup.inlineKeyboard(this.getFiltersKeyboard('house'))
             )
         });
 
