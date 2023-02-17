@@ -20,6 +20,9 @@ export default class Collector {
 
         for (let type in filters) {
             let values = filters[type];
+            if (values.length === 0) {
+                continue;
+            }
             values.push(type);
             values.push('location');
 
@@ -59,5 +62,11 @@ export default class Collector {
             result,
             newest,
         };
+    }
+
+    getUrls(): string[] {
+        return this.providers.map((provider: Base) => {
+            return provider.getUrl(1);
+        });
     }
 }

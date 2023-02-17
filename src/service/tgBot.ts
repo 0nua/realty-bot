@@ -2,8 +2,10 @@ import {Markup, Telegraf} from 'telegraf';
 import fs from 'fs';
 import YaDisk from './yaDisk';
 import Collector from './collector';
-import {Settings} from "../interfaces/settings";
+import {Filters, Settings} from "../interfaces/settings";
 import Data from "../interfaces/collectorData";
+import {set} from "lodash";
+import {keyboard} from "telegraf/typings/markup";
 
 export default class TgBot {
     bot: Telegraf;
@@ -98,12 +100,12 @@ export default class TgBot {
         return data;
     }
 
-    async getFilters(ctx: any, settings: Settings | null = null, selectedType: string | null = null) {
+    async getFilters(chatId: number, settings: Settings | null = null, selectedType: string | null = null) {
         if (settings === null) {
             settings = await this.yaDisk.get();
         }
 
-        let filters = settings && settings[ctx.chat.id]?.filters || {};
+        let filters = settings && settings[chatId]?.filters || {};
 
         let keyboard = [];
         for (let type in filters) {
@@ -118,29 +120,36 @@ export default class TgBot {
             }
         }
 
-        if (keyboard.length === 0) {
-            await ctx.reply('Uh-oh. I could not find any filters');
-            return;
-        }
-
-        await ctx.reply('This is your filters, click if would like to remove any', Markup.inlineKeyboard(keyboard));
+        return keyboard;
     }
 
-    getFiltersKeyboard(type: string): any {
-        let keyboard = [
-            [Markup.button.callback('Only new buildings', `filter-${type}-newly`)],
-            [Markup.button.callback('With pets', `filter-${type}-pets`)],
-            [Markup.button.callback('Min. 2 rooms', `filter-${type}-room-2`)],
-            [Markup.button.callback('Min. 3 rooms', `filter-${type}-room-3`)],
-            [Markup.button.callback('Min. 4 rooms', `filter-${type}-room-4`)],
-            [Markup.button.callback('Min. 100th Ft/month', `filter-${type}-price-100`)],
-            [Markup.button.callback('Min. 300th Ft/month', `filter-${type}-price-300`)],
-            [Markup.button.callback('Min. 500th Ft/month', `filter-${type}-price-500`)],
-            [Markup.button.callback('Min. 700th Ft/month', `filter-${type}-price-700`)],
-        ];
+    getFiltersKeyboard(type: string, filters: Filters): any {
+
+        let typeFilters = filters[type] ?? [];
+
+        let buttons = {
+            newly: 'New build',
+            pets: 'Pets friendly',
+            "room-2": 'Min. 2 rooms',
+            "room-3": 'Min. 3 rooms',
+            "room-4": 'Min. 4 rooms',
+            "price-100": 'Min. 100th Ft/month',
+            "price-300": 'Min. 300th Ft/month',
+            "price-500": 'Min. 500th Ft/month',
+            "price-700": 'Min. 700th Ft/month'
+        };
 
         if (type === 'flat') {
-            keyboard.push([Markup.button.callback('With balcony', `filter-${type}-balcony`)]);
+            buttons['balcony'] = 'With balcony';
+        }
+
+        let keyboard = [];
+        for (let alias in buttons) {
+            let name = buttons[alias];
+
+            keyboard.push(
+                [Markup.button.callback(`${name} ${typeFilters.includes(alias) ? '+' : ''}`, `filter-${type}-${alias}`)]
+            )
         }
 
         return keyboard;
@@ -152,8 +161,8 @@ export default class TgBot {
                 'What kind of realty do you need?',
                 Markup.inlineKeyboard(
                     [
-                        Markup.button.callback('Flat', `flat`),
-                        Markup.button.callback('House', `house`),
+                        Markup.button.callback('Flat', `realty-flat`),
+                        Markup.button.callback('House', `realty-house`),
                     ]
                 )
             );
@@ -169,17 +178,14 @@ export default class TgBot {
             await ctx.reply('Subscribe was rejected! Goodbye!');
         });
 
-        this.bot.action('flat', ctx => {
-            ctx.reply(
-                'Okay, you need a flat, may be some details?!',
-                Markup.inlineKeyboard(this.getFiltersKeyboard('flat'))
-            )
-        });
+        this.bot.action(/realty-(.+)/, async (ctx: any) => {
+            let type = ctx.match[1];
+            let settings: Settings = await this.yaDisk.get();
+            let filters: Filters = settings[ctx.chat.id]?.filters || {};
 
-        this.bot.action('house', ctx => {
-            ctx.reply(
-                'Okay, you need a house, may be some details?!',
-                Markup.inlineKeyboard(this.getFiltersKeyboard('house'))
+            ctx.editMessageText(
+                `Okay, you need a ${type}, may be some details?!`,
+                Markup.inlineKeyboard(this.getFiltersKeyboard(type, filters))
             )
         });
 
@@ -203,7 +209,11 @@ export default class TgBot {
                 filters = filters.filter((item: string) => !item.includes('price'));
             }
 
-            filters.push(name);
+            if (filters.indexOf(name) === -1) {
+                filters.push(name);
+            } else {
+                filters = filters.filter((item: string) => item !== name);
+            }
 
             settings[ctx.chat.id].filters[type] = filters;
 
@@ -211,28 +221,32 @@ export default class TgBot {
 
             await this.yaDisk.delete(`/realty-bot/collection_${ctx.chat.id}.json`);
 
-            await ctx.reply(`Filter ${type} ${name} was added`);
-            await this.getFilters(ctx, settings, type);
+            await ctx.editMessageReplyMarkup(
+                {
+                    inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id].filters)
+                }
+            );
         });
 
-        this.bot.command('filters', async ctx => {
-            await this.getFilters(ctx);
-        });
-
-        this.bot.action(/delete-(flat|house)-(.+)/, async (ctx: any) => {
+        this.bot.command('status', async ctx => {
             let settings: Settings = await this.yaDisk.get();
-            let type = ctx.match[1];
-            let name = ctx.match[2];
-            let filters = settings[ctx.chat.id].filters;
 
-            settings[ctx.chat.id].filters[type] = filters[type].filter((item: string) => item !== name);
+            if (settings.hasOwnProperty(ctx.chat.id)) {
+                let collector = new Collector(ctx.chat.id, settings[ctx.chat.id].filters);
 
-            await this.yaDisk.update(settings);
+                let links = [];
+                for (let link in collector.getUrls()) {
+                    let url = collector.getUrls()[link];
+                    links.push([Markup.button.url(url, url)]);
+                }
 
-            await this.yaDisk.delete(`/realty-bot/collection_${ctx.chat.id}.json`);
-
-            await ctx.reply(`Filter ${type} ${name} was deleted`);
-            await this.getFilters(ctx, settings);
+                await ctx.reply(
+                    'Your are in the business. There are your subscription links',
+                    Markup.inlineKeyboard(links)
+                );
+            } else {
+                await ctx.reply('Uh-oh. /configure you filters for start get updates.');
+            }
         });
 
         this.bot.command('admin', async ctx => {
