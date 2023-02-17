@@ -22,20 +22,33 @@ export class Alberlet extends Base {
             newly: 'ujszeru:igen'
         };
 
-        let filtersUrl = this.filters.map(
-            (filter) => {
-                if (filter.includes('room')) {
-                    let [, count] = filter.split('-');
-                    return `szoba:${count}-x`;
+        let min = '0', max = 'x';
+
+        let filters = this.filters
+            .map(
+                (filter) => {
+                    if (filter.includes('room')) {
+                        let [, count] = filter.split('-');
+                        return `szoba:${count}-x`;
+                    }
+                    if (filter.includes('price')) {
+                        min = filter.split('-')[1];
+                        return null;
+                    }
+
+                    if (filter.includes('max')) {
+                        max = filter.split('-')[1];
+                        return null;
+                    }
+
+                    return filterMap[filter] || null;
                 }
-                if (filter.includes('price')) {
-                    let [, price] = filter.split('-');
-                    return `berleti-dij:${price}-x-ezer-ft`;
-                }
-                return filterMap[filter] || 'undefined';
-            }
-        ).join('/');
-        return `https://en.alberlet.hu/kiado_alberlet/page:${page}/${filtersUrl}`;
+            )
+            .filter((part => part !== null));
+
+        filters.push(`berleti-dij:${min}-${max}-ezer-ft`);
+
+        return `https://en.alberlet.hu/kiado_alberlet/page:${page}/${filters.join('/')}`;
     }
 
     parse(card: any) {

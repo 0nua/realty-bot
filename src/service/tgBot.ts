@@ -102,8 +102,8 @@ export default class TgBot {
             "room-4": 'Min. 4 rooms',
             "price-100": 'Min. 100th Ft/month',
             "price-300": 'Min. 300th Ft/month',
-            "price-500": 'Min. 500th Ft/month',
-            "price-700": 'Min. 700th Ft/month'
+            "max-500": 'Max. 500th Ft/month',
+            "max-700": 'Max. 700th Ft/month'
         };
 
         if (type === 'flat') {
@@ -174,6 +174,10 @@ export default class TgBot {
 
             if (name.includes('price')) {
                 filters = filters.filter((item: string) => !item.includes('price') || item === name);
+            }
+
+            if (name.includes('max')) {
+                filters = filters.filter((item: string) => !item.includes('max') || item === name);
             }
 
             if (filters.indexOf(name) === -1) {

@@ -22,20 +22,38 @@ export class Ingatlan extends Base {
             balcony: '1-m2erkely-felett',
         };
 
-        let filtersUrl = this.filters.map(
-            (filter) => {
-                if (filter.includes('room')) {
-                    let [, count] = filter.split('-');
-                    return `${count}-szoba-felett`;
+        let min = '0', max = '0';
+
+        let filters = this.filters
+            .map(
+                (filter) => {
+                    if (filter.includes('room')) {
+                        let [, count] = filter.split('-');
+                        return `${count}-szoba-felett`;
+                    }
+                    if (filter.includes('price')) {
+                        min = filter.split('-')[1];
+                        return null;
+                    }
+
+                    if (filter.includes('max')) {
+                        max = filter.split('-')[1];
+                        return null;
+                    }
+                    return filterMap[filter] || null;
                 }
-                if (filter.includes('price')) {
-                    let [, price] = filter.split('-');
-                    return `havi-${price}-ezer-Ft-tol`;
-                }
-                return filterMap[filter] || 'undefined';
-            }
-        ).join('+');
-        return `https://realestatehungary.hu/szukites/kiado+${filtersUrl}?page=${page}`;
+            )
+            .filter((part => part !== null));
+
+        if (max !== '0' && min !== '0') {
+            filters.push(`havi-${min}-${max}-ezer-Ft`);
+        } else if (max !== '0') {
+            filters.push(`havi-${max}-ezer-Ft-ig`);
+        } else if (min !== '0') {
+            filters.push(`havi-${min}-ezer-Ft-tol`);
+        }
+
+        return `https://realestatehungary.hu/szukites/kiado+${filters.join('+')}?page=${page}`;
     }
 
     parse(card: any) {
