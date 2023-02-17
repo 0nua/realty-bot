@@ -86,7 +86,7 @@ export default class TgBot {
         let data = await collector.getData();
         if (data.newest.length !== 0) {
             for (let item of data.newest) {
-                //await this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.id}`);
+                await this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.id}`);
             }
         }
 
@@ -98,15 +98,18 @@ export default class TgBot {
         return data;
     }
 
-    async getFilters(ctx: any, settings: Settings | null = null) {
+    async getFilters(ctx: any, settings: Settings | null = null, selectedType: string | null = null) {
         if (settings === null) {
             settings = await this.yaDisk.get();
         }
 
-        let filters = settings && settings[ctx.chat.id].filters || {};
+        let filters = settings && settings[ctx.chat.id]?.filters || {};
 
         let keyboard = [];
         for (let type in filters) {
+            if (selectedType !== null && type !== selectedType) {
+                continue;
+            }
             for (let index in filters[type]) {
                 let item = filters[type][index];
                 keyboard.push(
@@ -146,10 +149,10 @@ export default class TgBot {
     init(): void {
         this.bot.command(['start', 'configure'], async ctx => {
             await ctx.reply(
-                'What kind of realty would you rent?',
+                'What kind of realty do you need?',
                 Markup.inlineKeyboard(
                     [
-                        Markup.button.callback('Apartments', `flat`),
+                        Markup.button.callback('Flat', `flat`),
                         Markup.button.callback('House', `house`),
                     ]
                 )
@@ -206,8 +209,10 @@ export default class TgBot {
 
             await this.yaDisk.update(settings);
 
+            await this.yaDisk.delete(`/realty-bot/collection_${ctx.chat.id}.json`);
+
             await ctx.reply(`Filter ${type} ${name} was added`);
-            await this.getFilters(ctx, settings);
+            await this.getFilters(ctx, settings, type);
         });
 
         this.bot.command('filters', async ctx => {
@@ -224,13 +229,19 @@ export default class TgBot {
 
             await this.yaDisk.update(settings);
 
+            await this.yaDisk.delete(`/realty-bot/collection_${ctx.chat.id}.json`);
+
             await ctx.reply(`Filter ${type} ${name} was deleted`);
             await this.getFilters(ctx, settings);
         });
 
-        this.bot.help(async ctx => {
+        this.bot.command('admin', async ctx => {
             let settings: Settings = await this.yaDisk.get();
-            await ctx.reply(`Keep calm and relax! Your chat id ${ctx.chat.id}. Settings: ${JSON.stringify(settings)}`);
+            let count = Object.keys(settings).filter(item => item !== 'chatIds').length;
+
+            await ctx.reply(`Your chat id ${ctx.chat.id}`);
+            await ctx.reply(`Notification frequency ~ every ${5 * count} min`);
+            await ctx.reply(`Settings: ${JSON.stringify(settings)}`);
         });
 
         this.bot.catch((err: any, ctx: any) => {

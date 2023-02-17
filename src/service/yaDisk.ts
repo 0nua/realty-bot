@@ -79,4 +79,17 @@ export default class YaDisk {
         }
     }
 
+    async delete(path: string): Promise<boolean> {
+        try {
+            let response = await axios.delete(
+                `https://cloud-api.yandex.net/v1/disk/resources?path=${path}`,
+                this.config,
+            );
+            return response.status === 204;
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
+    }
+
 }
