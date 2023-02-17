@@ -157,6 +157,10 @@ export default class TgBot {
                         [Markup.button.callback('Min. 2 rooms', 'filter-flat-room-2')],
                         [Markup.button.callback('Min. 3 rooms', 'filter-flat-room-3')],
                         [Markup.button.callback('Min. 4 rooms', 'filter-flat-room-4')],
+                        [Markup.button.callback('Min. 100th Ft/month', 'filter-flat-price-100')],
+                        [Markup.button.callback('Min. 300th Ft/month', 'filter-flat-price-300')],
+                        [Markup.button.callback('Min. 500th Ft/month', 'filter-flat-price-500')],
+                        [Markup.button.callback('Min. 700th Ft/month', 'filter-flat-price-700')],
                     ]
                 )
             )
@@ -172,6 +176,10 @@ export default class TgBot {
                         [Markup.button.callback('Min. 2 rooms', 'filter-house-room-2')],
                         [Markup.button.callback('Min. 3 rooms', 'filter-house-room-3')],
                         [Markup.button.callback('Min. 4 rooms', 'filter-house-room-4')],
+                        [Markup.button.callback('Min. 100th Ft/month', 'filter-house-price-100')],
+                        [Markup.button.callback('Min. 300th Ft/month', 'filter-house-price-300')],
+                        [Markup.button.callback('Min. 500th Ft/month', 'filter-house-price-500')],
+                        [Markup.button.callback('Min. 700th Ft/month', 'filter-house-price-700')],
                     ]
                 )
             )
@@ -191,6 +199,10 @@ export default class TgBot {
 
             if (name.includes('room')) {
                 filters = filters.filter((item: string) => !item.includes('room'));
+            }
+
+            if (name.includes('price')) {
+                filters = filters.filter((item: string) => !item.includes('price'));
             }
 
             filters.push(name);

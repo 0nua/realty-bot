@@ -19,8 +19,6 @@ export class Ingatlan extends Base {
             flat: 'lakas',
             newly: 'uj-epitesu',
             location: 'budapest',
-            room: 'szoba-felett',
-            price: 'havi-600-ezer-Ft-ig',
             balcony: '1-m2erkely-felett',
         };
 
@@ -28,7 +26,11 @@ export class Ingatlan extends Base {
             (filter) => {
                 if (filter.includes('room')) {
                     let [, count] = filter.split('-');
-                    return `${count}-${filterMap.room}`;
+                    return `${count}-szoba-felett`;
+                }
+                if (filter.includes('price')) {
+                    let [, price] = filter.split('-');
+                    return `havi-${price}-ezer-Ft-tol`;
                 }
                 return filterMap[filter] || 'undefined';
             }

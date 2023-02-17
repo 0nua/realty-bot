@@ -18,8 +18,6 @@ export class Alberlet extends Base {
             house: 'ingatlan-tipus:haz',
             flat: 'ingatlan-tipus:lakas',
             location: 'megye:budapest',
-            room: 'szoba',
-            price: 'berleti-dij:0-600-ezer-ft',
             balcony: 'erkely:igen',
             newly: 'ujszeru:igen'
         };
@@ -28,7 +26,11 @@ export class Alberlet extends Base {
             (filter) => {
                 if (filter.includes('room')) {
                     let [, count] = filter.split('-');
-                    return `${filterMap.room}:${count}-x`;
+                    return `szoba:${count}-x`;
+                }
+                if (filter.includes('price')) {
+                    let [, price] = filter.split('-');
+                    return `berleti-dij:${price}-x-ezer-ft`;
                 }
                 return filterMap[filter] || 'undefined';
             }
