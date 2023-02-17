@@ -4,7 +4,6 @@ import lodash from 'lodash';
 export default class YaDisk {
     path: string;
     config: object;
-    cache: object | null;
 
     constructor(path: string) {
         this.path = path;
@@ -13,20 +12,16 @@ export default class YaDisk {
                 Authorization: `OAuth ${process.env.YA_TOKEN}`,
             },
         };
-        this.cache = null;
     }
 
     async get(): Promise<any> {
         try {
-            if (this.cache === null) {
-                let response = await axios.get(
-                    `https://cloud-api.yandex.net/v1/disk/resources/download?path=${this.path}`,
-                    this.config,
-                );
-                let content = await this.download(response.data.href);
-                this.cache = JSON.parse(content);
-            }
-            return this.cache;
+            let response = await axios.get(
+                `https://cloud-api.yandex.net/v1/disk/resources/download?path=${this.path}`,
+                this.config,
+            );
+            let content = await this.download(response.data.href);
+            return JSON.parse(content);
         } catch (err) {
             console.log(err);
             return {};
@@ -46,7 +41,6 @@ export default class YaDisk {
 
     async update(data: object, merge = false): Promise<boolean> {
         try {
-            this.cache = null;
             if (merge) {
                 let old = await this.get();
                 data = lodash.mergeWith({}, old, data, (a, b) => {
