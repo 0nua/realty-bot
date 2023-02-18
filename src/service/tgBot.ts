@@ -91,10 +91,7 @@ export default class TgBot {
             }
         }
 
-        await this.bot.telegram.sendMessage(
-            367825282,
-            `${chatId} has ${Object.keys(data.result).length} items. ${data.newest.length} messages were sent`,
-        );
+        console.log({chatId: chatId, collection: Object.keys(data.result).length, new: data.newest.length})
 
         return data;
     }
@@ -235,6 +232,8 @@ export default class TgBot {
                     let url = collector.getUrls()[link];
                     links.push([Markup.button.url(url, url)]);
                 }
+
+                links.push([Markup.button.callback('Close', 'close')]);
 
                 await ctx.reply(
                     'Your are in the business. There are your subscription links',
