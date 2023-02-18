@@ -85,12 +85,10 @@ export default class TgBot {
         let collector = new Collector(chatId, settings[chatId].filters);
         let data = await collector.getData();
         if (data.newest.length > 0) {
-            let log = [];
             for (let item of data.newest) {
                 await this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.id}`);
-                log.push({url: item.id, price: item.price, chatId: chatId});
+                console.log({url: item.id, price: item.price, chatId: chatId});
             }
-            console.log(log);
         }
 
         await this.bot.telegram.sendMessage(
@@ -119,6 +117,13 @@ export default class TgBot {
             )
         }
 
+        let nextType = type === 'flat' ? 'house' : 'flat';
+        keyboard.push(
+            [
+                Markup.button.callback('<< Back', 'back'),
+                Markup.button.callback(`${nextType} >>`, `realty-${nextType}`)]
+        );
+
         return keyboard;
     }
 
@@ -130,18 +135,30 @@ export default class TgBot {
         return this.yaDisk.update('/realty-bot/config.json', settings);
     }
 
+    getConfigureKeyboard() {
+        return Markup.inlineKeyboard(
+            [
+                [
+                    Markup.button.callback('Flat', `realty-flat`),
+                    Markup.button.callback('House', `realty-house`),
+                ],
+                [
+                    Markup.button.callback('Close', 'close')
+                ]
+            ]
+        );
+    }
+
     init(): void {
-        this.bot.command(['start', 'configure'], async ctx => {
-            await ctx.reply(
-                'What kind of realty do you need?',
-                Markup.inlineKeyboard(
-                    [
-                        Markup.button.callback('Flat', `realty-flat`),
-                        Markup.button.callback('House', `realty-house`),
-                    ]
-                )
-            );
+        this.bot.command(['start', 'configure'], ctx => {
+            ctx.reply('What kind of realty do you need?', this.getConfigureKeyboard());
         });
+
+        this.bot.action('back', ctx => {
+            ctx.editMessageText('What kind of realty do you need?', this.getConfigureKeyboard());
+        });
+
+        this.bot.action('close', ctx => ctx.deleteMessage());
 
         this.bot.command('stop', async ctx => {
             let settings = await this.getSettings();
