@@ -21,8 +21,11 @@ export default class YaDisk {
             );
             let content = await this.download(response.data.href);
             return JSON.parse(content);
-        } catch (err) {
-            console.log(err);
+        } catch (err: any) {
+            let status = err.response && err.response.status
+            if (status !== 404) {
+                console.log(err);
+            }
             return def;
         }
     }

@@ -4,8 +4,6 @@ import YaDisk from './yaDisk';
 import Collector from './collector';
 import {Filters, Settings} from "../interfaces/settings";
 import Data from "../interfaces/collectorData";
-import {set} from "lodash";
-import {keyboard} from "telegraf/typings/markup";
 
 export default class TgBot {
     bot: Telegraf;
@@ -25,10 +23,6 @@ export default class TgBot {
         return await this.bot.handleUpdate(req.body);
     }
 
-    /**
-     * Set webhook
-     * @param req
-     */
     setWebhook(req: any): Promise<boolean> {
         let event = req.apiGateway.event;
         let link = `https://${event.requestContext.domainName}/dev/webhook`;
@@ -171,16 +165,9 @@ export default class TgBot {
 
             let filters = settings[ctx.chat.id].filters[type] || [];
 
-            if (name.includes('room')) {
-                filters = filters.filter((item: string) => !item.includes('room') || item === name);
-            }
-
-            if (name.includes('price')) {
-                filters = filters.filter((item: string) => !item.includes('price') || item === name);
-            }
-
-            if (name.includes('max')) {
-                filters = filters.filter((item: string) => !item.includes('max') || item === name);
+            if (name.includes('-')) {
+                let [alias, value] = name.split('-');
+                filters = filters.filter((item: string) => !item.includes(alias) || item === name);
             }
 
             if (filters.indexOf(name) === -1) {
