@@ -22,29 +22,28 @@ export class Alberlet extends Base {
             newly: 'ujszeru:igen'
         };
 
-        let min = '0', max = 'x';
+        let min = '0',
+            max = 'x';
 
-        let filters = this.filters
-            .map(
-                (filter) => {
-                    if (filter.includes('room')) {
-                        let [, count] = filter.split('-');
-                        return `szoba:${count}-x`;
+        let filters = this.filters.map(
+            (filter) => {
+                if (filter.includes('-')) {
+                    let [name, value] = filter.split('-');
+                    switch (name) {
+                        case 'price':
+                            min = value;
+                            return null;
+                        case 'max':
+                            max = value;
+                            return null;
+                        case 'room':
+                            return `szoba:${value}-x`;
                     }
-                    if (filter.includes('price')) {
-                        min = filter.split('-')[1];
-                        return null;
-                    }
-
-                    if (filter.includes('max')) {
-                        max = filter.split('-')[1];
-                        return null;
-                    }
-
-                    return filterMap[filter] || null;
                 }
-            )
-            .filter((part => part !== null));
+
+                return filterMap[filter] || null;
+            })
+            .filter(filter => filter !== null);
 
         filters.push(`berleti-dij:${min}-${max}-ezer-ft`);
 

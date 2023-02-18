@@ -22,34 +22,33 @@ export class Ingatlan extends Base {
             balcony: '1-m2erkely-felett',
         };
 
-        let min = '0', max = '0';
+        let min = null,
+            max = null;
 
-        let filters = this.filters
-            .map(
-                (filter) => {
-                    if (filter.includes('room')) {
-                        let [, count] = filter.split('-');
-                        return `${count}-szoba-felett`;
+        let filters = this.filters.map(
+            (filter) => {
+                if (filter.includes('-')) {
+                    let [name, value] = filter.split('-');
+                    switch (name) {
+                        case 'price':
+                            min = value;
+                            return null;
+                        case 'max':
+                            max = value;
+                            return null;
+                        case 'room':
+                            return `${value}-szoba-felett`;
                     }
-                    if (filter.includes('price')) {
-                        min = filter.split('-')[1];
-                        return null;
-                    }
-
-                    if (filter.includes('max')) {
-                        max = filter.split('-')[1];
-                        return null;
-                    }
-                    return filterMap[filter] || null;
                 }
-            )
-            .filter((part => part !== null));
+                return filterMap[filter] || null;
+            })
+            .filter(filter => filter !== null);
 
-        if (max !== '0' && min !== '0') {
+        if (max && min) {
             filters.push(`havi-${min}-${max}-ezer-Ft`);
-        } else if (max !== '0') {
+        } else if (max) {
             filters.push(`havi-${max}-ezer-Ft-ig`);
-        } else if (min !== '0') {
+        } else if (min) {
             filters.push(`havi-${min}-ezer-Ft-tol`);
         }
 
