@@ -81,9 +81,13 @@ export default class YaDisk {
                 this.config,
             );
             return response.status === 204;
-        } catch (err) {
-            console.error(err);
-            return false;
+        } catch (err: any) {
+            let status = err.response && err.response.status
+            if (status !== 404) {
+                console.error(err);
+                return false;
+            }
+            return true;
         }
     }
 
