@@ -105,13 +105,14 @@ export default class TgBot {
 
         let typeFilters = filters[type] ?? [];
 
+        let buttons = {...this.buttons};
         if (type === 'flat') {
-            this.buttons['balcony'] = 'With balcony';
+            buttons['balcony'] = 'With balcony';
         }
 
         let keyboard = [];
-        for (let alias in this.buttons) {
-            let name = this.buttons[alias];
+        for (let alias in buttons) {
+            let name = buttons[alias];
 
             keyboard.push(
                 [Markup.button.callback(`${name} ${typeFilters.includes(alias) ? '+' : ''}`, `filter-${type}-${alias}`)]
