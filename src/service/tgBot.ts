@@ -6,12 +6,26 @@ import {Filters, Settings} from "../interfaces/settings";
 import Data from "../interfaces/collectorData";
 
 export default class TgBot {
+
     bot: Telegraf;
     yaDisk: YaDisk;
+    buttons: object
 
     constructor() {
         this.yaDisk = new YaDisk();
         this.bot = new Telegraf(process.env.TG_BOT_TOKEN || 'null');
+        this.buttons = {
+            newly: 'New build',
+            pets: 'Pets friendly',
+            "room-2": 'Min. 2 rooms',
+            "room-3": 'Min. 3 rooms',
+            "room-4": 'Min. 4 rooms',
+            "price-100": 'Min. 100th Ft/month',
+            "price-300": 'Min. 300th Ft/month',
+            "max-500": 'Max. 500th Ft/month',
+            "max-700": 'Max. 700th Ft/month'
+        };
+
         this.init();
     }
 
@@ -91,25 +105,13 @@ export default class TgBot {
 
         let typeFilters = filters[type] ?? [];
 
-        let buttons = {
-            newly: 'New build',
-            pets: 'Pets friendly',
-            "room-2": 'Min. 2 rooms',
-            "room-3": 'Min. 3 rooms',
-            "room-4": 'Min. 4 rooms',
-            "price-100": 'Min. 100th Ft/month',
-            "price-300": 'Min. 300th Ft/month',
-            "max-500": 'Max. 500th Ft/month',
-            "max-700": 'Max. 700th Ft/month'
-        };
-
         if (type === 'flat') {
-            buttons['balcony'] = 'With balcony';
+            this.buttons['balcony'] = 'With balcony';
         }
 
         let keyboard = [];
-        for (let alias in buttons) {
-            let name = buttons[alias];
+        for (let alias in this.buttons) {
+            let name = this.buttons[alias];
 
             keyboard.push(
                 [Markup.button.callback(`${name} ${typeFilters.includes(alias) ? '+' : ''}`, `filter-${type}-${alias}`)]
