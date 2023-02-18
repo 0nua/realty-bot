@@ -105,21 +105,24 @@ export default class TgBot {
             buttons['balcony'] = 'With balcony';
         }
 
-        let keyboard = [];
-        for (let alias in buttons) {
-            let name = buttons[alias];
-
-            keyboard.push(
-                [Markup.button.callback(`${name} ${typeFilters.includes(alias) ? '+' : ''}`, `filter-${type}-${alias}`)]
-            )
-        }
-
         let nextType = type === 'flat' ? 'house' : 'flat';
-        keyboard.push(
+        let keyboard = [
             [
                 Markup.button.callback('<< Back', 'back'),
-                Markup.button.callback(`${nextType} >>`, `realty-${nextType}`)]
-        );
+                Markup.button.callback(`${nextType} >>`, `realty-${nextType}`)
+            ],
+            [Markup.button.callback('Close', 'close')]
+        ];
+
+        for (let alias in buttons) {
+            keyboard.unshift(
+                [
+                    Markup.button.callback(
+                        `${buttons[alias]} ${typeFilters.includes(alias) ? '+' : ''}`, `filter-${type}-${alias}`
+                    )
+                ]
+            )
+        }
 
         return keyboard;
     }
