@@ -1,9 +1,9 @@
 import YaDisk from './yaDisk';
 import lodash from 'lodash';
 import Base from '../provider/base';
-import { Ingatlan } from '../provider/ingatlan';
-import { RentWithPaws } from '../provider/rentWithPaws';
-import { Alberlet } from '../provider/alberlet';
+import {Ingatlan} from '../provider/ingatlan';
+import {RentWithPaws} from '../provider/rentWithPaws';
+import {Alberlet} from '../provider/alberlet';
 import Item from '../interfaces/providerItem';
 import Data from '../interfaces/collectorData';
 import {Filters} from "../interfaces/settings";
@@ -52,20 +52,21 @@ export default class Collector {
 
         let newest: Item[] = [];
         let collection = await this.getCollection();
-        Object.keys(result).forEach(id => {
+        let firstTime = collection.length === 0;
+
+        for (let id in Object.keys(result)) {
             if (collection.indexOf(id) !== -1) {
-                return;
+                continue;
             }
 
-            newest.push(result[id]);
-        });
+            collection.push(id);
 
-        //first time start
-        if (Object.keys(collection).length === 0) {
-            newest = [];
+            if (firstTime === false) {
+                newest.push(result[id]);
+            }
         }
 
-        await this.updateCollection(Object.keys(result));
+        await this.updateCollection(collection);
 
         return {
             result,
