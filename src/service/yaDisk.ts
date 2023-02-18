@@ -1,11 +1,13 @@
 import axios from 'axios';
 
 export default class YaDisk {
-    path: string;
-    config: object;
+    config: {
+        headers: {
+            Authorization: string
+        }
+    };
 
-    constructor(path: string) {
-        this.path = path;
+    constructor() {
         this.config = {
             headers: {
                 Authorization: `OAuth ${process.env.YA_TOKEN}`,
@@ -13,10 +15,10 @@ export default class YaDisk {
         };
     }
 
-    async get(def:any = {}): Promise<any> {
+    async get(path: string, def:any = {}): Promise<any> {
         try {
             let response = await axios.get(
-                `https://cloud-api.yandex.net/v1/disk/resources/download?path=${this.path}`,
+                `https://cloud-api.yandex.net/v1/disk/resources/download?path=${path}`,
                 this.config,
             );
             let content = await this.download(response.data.href);
@@ -24,7 +26,7 @@ export default class YaDisk {
         } catch (err: any) {
             let status = err.response && err.response.status
             if (status !== 404) {
-                console.log(err);
+                console.error(err);
             }
             return def;
         }
@@ -41,10 +43,10 @@ export default class YaDisk {
         });
     }
 
-    async update(data: object): Promise<boolean> {
+    async update(path: string, data: object): Promise<boolean> {
         try {
             let upload = await axios.get(
-                `https://cloud-api.yandex.net/v1/disk/resources/upload?overwrite=true&path=${this.path}`,
+                `https://cloud-api.yandex.net/v1/disk/resources/upload?overwrite=true&path=${path}`,
                 this.config,
             );
 
@@ -67,7 +69,7 @@ export default class YaDisk {
 
             return status === 'success';
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return false;
         }
     }
@@ -80,7 +82,7 @@ export default class YaDisk {
             );
             return response.status === 204;
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return false;
         }
     }

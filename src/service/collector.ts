@@ -10,12 +10,13 @@ import {Filters} from "../interfaces/settings";
 
 export default class Collector {
 
+    chatId: number;
     yaDisk: YaDisk;
     providers: Base[]
 
     constructor(chatId: number, filters: Filters) {
-        this.yaDisk = new YaDisk(`/realty-bot/collection_${chatId}.json`);
-
+        this.chatId = chatId;
+        this.yaDisk = new YaDisk();
         this.providers = [new RentWithPaws()];
 
         for (let type in filters) {
@@ -31,6 +32,14 @@ export default class Collector {
         }
     }
 
+    async getCollection(): Promise<string[]> {
+        return this.yaDisk.get(`/realty-bot/collection_${this.chatId}.json`, []);
+    }
+
+    async updateCollection(collection: string[]): Promise<boolean> {
+        return this.yaDisk.update(`/realty-bot/collection_${this.chatId}.json`, collection);
+    }
+
     async getData(): Promise<Data> {
         let result = {};
         let promises = [];
@@ -42,7 +51,7 @@ export default class Collector {
         await Promise.all(promises);
 
         let newest: Item[] = [];
-        let collection = await this.yaDisk.get([]);
+        let collection = await this.getCollection();
         Object.keys(result).forEach(id => {
             if (collection.indexOf(id) !== -1) {
                 return;
@@ -56,7 +65,7 @@ export default class Collector {
             newest = [];
         }
 
-        await this.yaDisk.update(Object.keys(result));
+        await this.updateCollection(Object.keys(result));
 
         return {
             result,

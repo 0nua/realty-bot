@@ -10,7 +10,7 @@ export default class TgBot {
     yaDisk: YaDisk;
 
     constructor() {
-        this.yaDisk = new YaDisk('realty-bot/config.json');
+        this.yaDisk = new YaDisk();
         this.bot = new Telegraf(process.env.TG_BOT_TOKEN || 'null');
         this.init();
     }
@@ -57,14 +57,14 @@ export default class TgBot {
 
         if (id > 0) {
             settings[id].lastDate = (new Date()).getTime();
-            await this.yaDisk.update(settings);
+            await this.updateSettings(settings);
         }
 
         return id;
     }
 
     async checkUpdates(): Promise<any> {
-        let settings: Settings = await this.yaDisk.get();
+        let settings: Settings = await this.getSettings();
 
         let chatId = await this.getChatId(settings);
 
@@ -119,6 +119,14 @@ export default class TgBot {
         return keyboard;
     }
 
+    async getSettings(): Promise<Settings> {
+        return this.yaDisk.get('/realty-bot/config.json');
+    }
+
+    async updateSettings(settings: Settings): Promise<boolean> {
+        return this.yaDisk.update('/realty-bot/config.json', settings);
+    }
+
     init(): void {
         this.bot.command(['start', 'configure'], async ctx => {
             await ctx.reply(
@@ -133,18 +141,18 @@ export default class TgBot {
         });
 
         this.bot.command('stop', async ctx => {
-            let settings: Settings = await this.yaDisk.get();
+            let settings = await this.getSettings();
 
             delete settings[ctx.chat.id];
 
-            await this.yaDisk.update(settings);
+            await this.updateSettings(settings);
 
             await ctx.reply('Subscribe was rejected! Goodbye!');
         });
 
         this.bot.action(/realty-(.+)/, async (ctx: any) => {
             let type = ctx.match[1];
-            let settings: Settings = await this.yaDisk.get();
+            let settings = await this.getSettings();
             let filters: Filters = settings[ctx.chat.id]?.filters || {};
 
             ctx.editMessageText(
@@ -154,7 +162,7 @@ export default class TgBot {
         });
 
         this.bot.action(/filter-(flat|house)-(.+)/, async (ctx: any) => {
-            let settings: Settings = await this.yaDisk.get();
+            let settings = await this.getSettings();
 
             let type = ctx.match[1];
             let name = ctx.match[2];
@@ -185,7 +193,7 @@ export default class TgBot {
                 delete settings[ctx.chat.id];
             }
 
-            await this.yaDisk.update(settings);
+            await this.updateSettings(settings);
 
             await this.yaDisk.delete(`/realty-bot/collection_${ctx.chat.id}.json`);
 
@@ -197,7 +205,7 @@ export default class TgBot {
         });
 
         this.bot.command('status', async ctx => {
-            let settings: Settings = await this.yaDisk.get();
+            let settings = await this.getSettings();
 
             if (settings.hasOwnProperty(ctx.chat.id)) {
                 let collector = new Collector(ctx.chat.id, settings[ctx.chat.id].filters);
@@ -218,7 +226,7 @@ export default class TgBot {
         });
 
         this.bot.command('admin', async ctx => {
-            let settings: Settings = await this.yaDisk.get();
+            let settings = await this.getSettings();
             let count = Object.keys(settings).filter(item => item !== 'chatIds').length;
 
             await ctx.reply(`Your chat id ${ctx.chat.id}`);
