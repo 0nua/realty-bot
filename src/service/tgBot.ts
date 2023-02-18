@@ -91,7 +91,7 @@ export default class TgBot {
             }
         }
 
-        console.log({chatId: chatId, collection: Object.keys(data.result).length, new: data.newest.length})
+        console.log({chatId: chatId, result: Object.keys(data.result).length, new: data.newest.length})
 
         return data;
     }
