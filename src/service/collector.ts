@@ -54,7 +54,7 @@ export default class Collector {
         let collection = await this.getCollection();
         let firstTime = collection.length === 0;
 
-        for (let id in Object.keys(result)) {
+        for (let id in result) {
             if (collection.indexOf(id) !== -1) {
                 continue;
             }
