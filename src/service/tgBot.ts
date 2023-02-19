@@ -85,10 +85,13 @@ export default class TgBot {
         let collector = new Collector(chatId, settings[chatId].filters);
         let data = await collector.getData();
         if (data.newest.length > 0) {
+            let messages = [];
             for (let item of data.newest) {
-                await this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.id}`);
+                messages.push(this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.id}`));
                 console.log({url: item.id, price: item.price, chatId: chatId});
             }
+
+            await Promise.all(messages);
         }
 
         console.log({chatId: chatId, result: Object.keys(data.result).length, new: data.newest.length})
