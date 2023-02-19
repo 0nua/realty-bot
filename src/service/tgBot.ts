@@ -247,6 +247,21 @@ export default class TgBot {
             }
         });
 
+        this.bot.command('about', ctx => {
+            ctx.reply(
+                "I check updates on sites https://tappancsosotthon.hu, https://en.alberlet.hu and https://realestatehungary.hu" +
+                "\n\n" +
+                "Use command /configure for set up your filters. https://tappancsosotthon.hu does not have filters, " +
+                "so you will get all updates from it.\nFilter your have already selected will be marked by \"+\" symbol, " +
+                "tap again for remove" +
+                "\n\n" +
+                "Use command /status for checking your subscription. You will get links with configured filters for check."
+                + "\n\n" +
+                "Use /stop for disable notifications. Your filters will be removed at all.",
+                Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
+            );
+        });
+
         this.bot.command('admin', async ctx => {
             let settings = await this.getSettings();
             let count = Object.keys(settings).filter(item => item !== 'chatIds').length;
