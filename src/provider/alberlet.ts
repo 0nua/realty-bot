@@ -10,6 +10,7 @@ export class Alberlet extends Base {
         this.filters = filters;
         this.selector = 'div.advert-data';
         this.withPages = true;
+        this.limit = 100;
     }
 
     getUrl(page: number) {
@@ -47,7 +48,7 @@ export class Alberlet extends Base {
 
         filters.push(`berleti-dij:${min}-${max}-ezer-ft`);
 
-        return `https://en.alberlet.hu/kiado_alberlet/page:${page}/${filters.join('/')}`;
+        return `https://en.alberlet.hu/kiado_alberlet/page:${page}/${filters.join('/')}/limit:${this.limit}`;
     }
 
     parse(card: any) {

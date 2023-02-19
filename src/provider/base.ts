@@ -9,11 +9,13 @@ export default class Base {
     url: string;
     selector: string;
     withPages: boolean;
+    limit: number | null;
 
     constructor() {
         this.url = '';
         this.selector = '';
         this.withPages = false;
+        this.limit = null;
     }
 
     async getData() {
@@ -24,7 +26,7 @@ export default class Base {
 
         do {
             let url = this.getUrl(page);
-            let response = await RequestWrapper.request(() => axios.get(url));
+            let response = await RequestWrapper.request((params: object) => axios.get(url, params));
 
             let dom = parser.parse(response.data);
             listings = dom.querySelectorAll(this.selector);
@@ -43,7 +45,13 @@ export default class Base {
                     result[key] = data;
                 }
             }
+
+            if (this.limit && listings.length !== this.limit) {
+                break;
+            }
+
             page++
+
         } while (this.withPages && listings.length !== 0);
 
         console.log(log);

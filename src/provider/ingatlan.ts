@@ -10,6 +10,7 @@ export class Ingatlan extends Base {
         this.filters = filters;
         this.selector = 'div.listing';
         this.withPages = true;
+        this.limit = 20
     }
 
     getUrl(page: number) {
