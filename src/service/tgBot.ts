@@ -111,7 +111,7 @@ export default class TgBot {
         let nextType = type === 'flat' ? 'house' : 'flat';
         let keyboard = [
             [
-                Markup.button.callback('<< Back', 'back'),
+                Markup.button.callback('<< Menu', 'back'),
                 Markup.button.callback(`${nextType} >>`, `realty-${nextType}`)
             ],
             [Markup.button.callback('Close', 'close')]
