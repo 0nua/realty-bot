@@ -23,7 +23,6 @@ export default class RequestWrapper {
                 time: requestTime
             }
         } catch (err: any) {
-            console.error(err);
             if (repeat) {
                 return RequestWrapper.request(requestCb, false);
             }
