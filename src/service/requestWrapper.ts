@@ -12,14 +12,22 @@ export default class RequestWrapper {
         }
     };
 
-    static async request(requestCb: any): Promise<Response> {
-        let requestStart = (new Date()).getTime();
-        let response = await requestCb(this.params);
-        let requestTime = ((new Date()).getTime() - requestStart) / 1000;
+    static async request(requestCb: any, repeat: boolean = true): Promise<Response> {
+        try {
+            let requestStart = (new Date()).getTime();
+            let response = await requestCb(this.params);
+            let requestTime = ((new Date()).getTime() - requestStart) / 1000;
 
-        return {
-            data: response.data,
-            time: requestTime
+            return {
+                data: response.data,
+                time: requestTime
+            }
+        } catch (err: any) {
+            console.error(err);
+            if (repeat) {
+                return RequestWrapper.request(requestCb, false);
+            }
+            throw err;
         }
     }
 }
