@@ -220,11 +220,15 @@ export default class TgBot {
 
             await this.yaDisk.delete(`/realty-bot/collection_${ctx.chat.id}.json`);
 
-            await ctx.editMessageReplyMarkup(
-                {
-                    inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
-                }
-            );
+            try {
+                await ctx.editMessageReplyMarkup(
+                    {
+                        inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
+                    }
+                );
+            } catch (err) {
+                await ctx.answerCbQuery();
+            }
         });
 
         this.bot.command('status', async ctx => {
