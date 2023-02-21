@@ -88,7 +88,6 @@ export default class TgBot {
             let messages = [];
             for (let item of data.newest) {
                 messages.push(this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.id}`));
-                console.log({url: item.id, price: item.price, chatId: chatId});
             }
 
             await Promise.all(messages);

@@ -56,8 +56,6 @@ export default class Base {
 
         } while (this.withPages && page < 50);
 
-        console.log(log);
-
         return result;
     }
 
