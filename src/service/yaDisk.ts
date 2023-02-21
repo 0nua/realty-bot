@@ -1,12 +1,13 @@
 import axios from 'axios';
-import lodash from 'lodash';
 
 export default class YaDisk {
-    path: string;
-    config: object;
+    config: {
+        headers: {
+            Authorization: string
+        }
+    };
 
-    constructor(path: string) {
-        this.path = path;
+    constructor() {
         this.config = {
             headers: {
                 Authorization: `OAuth ${process.env.YA_TOKEN}`,
@@ -14,23 +15,26 @@ export default class YaDisk {
         };
     }
 
-    async get(): Promise<any> {
+    async get(path: string, def:any = {}): Promise<any> {
         try {
             let response = await axios.get(
-                `https://cloud-api.yandex.net/v1/disk/resources/download?path=${this.path}`,
+                `https://cloud-api.yandex.net/v1/disk/resources/download?path=${path}`,
                 this.config,
             );
             let content = await this.download(response.data.href);
             return JSON.parse(content);
-        } catch (err) {
-            console.log(err);
-            return {};
+        } catch (err: any) {
+            let status = err.response && err.response.status
+            if (status !== 404) {
+                console.error(err);
+            }
+            return def;
         }
     }
 
     download(url: string): Promise<string> {
         return new Promise(async (resolve, reject) => {
-            let response = await axios.get(url, { responseType: 'stream' });
+            let response = await axios.get(url, {responseType: 'stream'});
             let stream = response.data;
             let content = '';
             stream.on('data', (data: string) => content += data);
@@ -39,19 +43,10 @@ export default class YaDisk {
         });
     }
 
-    async update(data: object, merge = false): Promise<boolean> {
+    async update(path: string, data: object): Promise<boolean> {
         try {
-            if (merge) {
-                let old = await this.get();
-                data = lodash.mergeWith({}, old, data, (a, b) => {
-                    if (lodash.isArray(a)) {
-                        return lodash.uniq(b.concat(a));
-                    }
-                });
-            }
-
             let upload = await axios.get(
-                `https://cloud-api.yandex.net/v1/disk/resources/upload?overwrite=true&path=${this.path}`,
+                `https://cloud-api.yandex.net/v1/disk/resources/upload?overwrite=true&path=${path}`,
                 this.config,
             );
 
@@ -74,8 +69,25 @@ export default class YaDisk {
 
             return status === 'success';
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return false;
+        }
+    }
+
+    async delete(path: string): Promise<boolean> {
+        try {
+            let response = await axios.delete(
+                `https://cloud-api.yandex.net/v1/disk/resources?path=${path}`,
+                this.config,
+            );
+            return response.status === 204;
+        } catch (err: any) {
+            let status = err.response && err.response.status
+            if (status !== 404) {
+                console.error(err);
+                return false;
+            }
+            return true;
         }
     }
 

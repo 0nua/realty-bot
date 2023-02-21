@@ -5,7 +5,7 @@
     "scripts": {
         "build": "npm install",
         "start": "tsc && serverless offline",
-        "deploy": "tsc && serverless deploy",
+        "deploy": "rm -rf ./dist && tsc && serverless deploy",
         "compile": "tsc"
     },
     "keywords": [],

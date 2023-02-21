@@ -14,7 +14,6 @@ provider:
 package:
     patterns:
         - '!src/**'
-        - '!types/**'
 
 plugins:
     - serverless-offline
@@ -35,9 +34,9 @@ functions:
                     path: /webhook
     monitor:
         handler: dist/handler/monitor.handle
-        timeout: 30
+        timeout: 300
         events:
-            -   schedule: rate(30 minutes)
+            -   schedule: rate(5 minutes)
             -   http:
                     method: get
                     path: /monitor

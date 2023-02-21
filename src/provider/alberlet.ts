@@ -10,6 +10,7 @@ export class Alberlet extends Base {
         this.filters = filters;
         this.selector = 'div.advert-data';
         this.withPages = true;
+        this.limit = 100;
     }
 
     getUrl(page: number) {
@@ -18,14 +19,36 @@ export class Alberlet extends Base {
             house: 'ingatlan-tipus:haz',
             flat: 'ingatlan-tipus:lakas',
             location: 'megye:budapest',
-            rooms: 'szoba:2-4',
-            price: 'berleti-dij:0-600-ezer-ft',
             balcony: 'erkely:igen',
             newly: 'ujszeru:igen'
         };
 
-        let filtersUrl = this.filters.map((filter) => filterMap[filter] || 'undefined').join('/');
-        return `https://en.alberlet.hu/kiado_alberlet/page:${page}/${filtersUrl}`;
+        let min = '0',
+            max = 'x';
+
+        let filters = this.filters.map(
+            (filter) => {
+                if (filter.includes('-')) {
+                    let [name, value] = filter.split('-');
+                    switch (name) {
+                        case 'price':
+                            min = value;
+                            return null;
+                        case 'max':
+                            max = value;
+                            return null;
+                        case 'room':
+                            return `szoba:${value}-x`;
+                    }
+                }
+
+                return filterMap[filter] || null;
+            })
+            .filter(filter => filter !== null);
+
+        filters.push(`berleti-dij:${min}-${max}-ezer-ft`);
+
+        return `https://en.alberlet.hu/kiado_alberlet/page:${page}/${filters.join('/')}/limit:${this.limit}`;
     }
 
     parse(card: any) {

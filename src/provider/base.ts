@@ -1,4 +1,4 @@
-import RequestWrapper from "../class/requestWrapper";
+import RequestWrapper from "../service/requestWrapper";
 import axios from 'axios';
 import parser from 'node-html-parser';
 import crypto from 'crypto';
@@ -9,40 +9,54 @@ export default class Base {
     url: string;
     selector: string;
     withPages: boolean;
+    limit: number | null;
 
     constructor() {
         this.url = '';
         this.selector = '';
         this.withPages = false;
+        this.limit = null;
     }
 
     async getData() {
         let result = {};
         let page = 1;
         let listings = [];
+        let log = [];
 
         do {
             let url = this.getUrl(page);
-            let response = await RequestWrapper.request(() => axios.get(url));
+            let response = await RequestWrapper.request((params: object) => axios.get(url, params));
 
             let dom = parser.parse(response.data);
             listings = dom.querySelectorAll(this.selector);
 
-            console.log({url: url, count: listings.length, time: response.time});
+            log.push({url: url, count: listings.length, time: response.time});
 
             if (listings.length > 0) {
-                listings.forEach(card => {
-                    let data = this.parse(card);
+                for (let index = 0; index < listings.length; index++) {
+                    let data = this.parse(listings[index]);
                     if (data === null) {
-                        return;
+                        continue;
                     }
+
                     let key = crypto.createHash('md5').update(data.id).digest('hex');
 
                     result[key] = data;
-                });
-                page++;
+                }
             }
-        } while (this.withPages && listings.length !== 0);
+
+            if (this.limit && listings.length !== this.limit) {
+                break;
+            }
+
+            page++
+
+            await new Promise(resolve => setTimeout(resolve, 0.5 * 1000)); //sleep 0.5 sec
+
+        } while (this.withPages && page < 50);
+
+        console.log(log);
 
         return result;
     }

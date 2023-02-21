@@ -1,5 +1,5 @@
 const express: any = require('serverless-express/express');
-import TgBot from './class/tgBot';
+import TgBot from './service/tgBot';
 
 const app = express();
 
