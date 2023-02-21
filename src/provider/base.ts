@@ -52,7 +52,9 @@ export default class Base {
 
             page++
 
-        } while (this.withPages && listings.length !== 0);
+            await new Promise(resolve => setTimeout(resolve, 0.5 * 1000)); //sleep 0.5 sec
+
+        } while (this.withPages && page < 50);
 
         console.log(log);
 

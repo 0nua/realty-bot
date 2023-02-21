@@ -265,13 +265,24 @@ export default class TgBot {
             );
         });
 
-        this.bot.command('admin', async ctx => {
+        this.bot.command('stat', async ctx => {
             let settings = await this.getSettings();
             let count = Object.keys(settings).filter(item => item !== 'chatIds').length;
 
-            await ctx.reply(`Your chat id ${ctx.chat.id}`);
-            await ctx.reply(`Notification frequency ~ every ${5 * count} min`);
-            await ctx.reply(`Settings: ${JSON.stringify(settings)}`);
+            await ctx.reply(
+                `Your chat id is ${ctx.chat.id}` + "\n" +
+                `Subcribed users: ${count}` + "\n" +
+                `Notification frequency ~ every ${5 * count} min`,
+                Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
+            );
+        });
+
+        this.bot.command('config', async ctx => {
+            let settings = await this.getSettings();
+            await ctx.reply(
+                `Settings: ${JSON.stringify(settings)}`,
+                Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
+            );
         });
 
         this.bot.catch((err: any, ctx: any) => {
