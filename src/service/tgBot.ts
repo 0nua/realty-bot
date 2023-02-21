@@ -138,6 +138,10 @@ export default class TgBot {
         return this.yaDisk.update('/realty-bot/config.json', settings);
     }
 
+    deleteCollection(chatId: number): Promise<boolean> {
+        return this.yaDisk.delete(`/realty-bot/collection_${chatId}.json`);
+    }
+
     getConfigureKeyboard() {
         return Markup.inlineKeyboard(
             [
@@ -169,6 +173,8 @@ export default class TgBot {
             delete settings[ctx.chat.id];
 
             await this.updateSettings(settings);
+
+            await this.deleteCollection(ctx.chat.id);
 
             await ctx.reply('Subscribe was rejected! Goodbye!');
         });
@@ -218,7 +224,7 @@ export default class TgBot {
 
             await this.updateSettings(settings);
 
-            await this.yaDisk.delete(`/realty-bot/collection_${ctx.chat.id}.json`);
+            await this.deleteCollection(ctx.chat.id);
 
             try {
                 await ctx.editMessageReplyMarkup(
