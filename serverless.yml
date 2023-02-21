@@ -7,6 +7,7 @@ provider:
     name: aws
     runtime: nodejs18.x
     region: eu-west-3
+    versionFunctions: false
     environment:
         TG_BOT_TOKEN: ${env:TG_BOT_TOKEN}
         YA_TOKEN: ${env:YA_TOKEN}
@@ -36,7 +37,7 @@ functions:
         handler: dist/handler/monitor.handle
         timeout: 300
         events:
-            -   schedule: rate(5 minutes)
+            -   schedule: rate(10 minutes)
             -   http:
                     method: get
                     path: /monitor

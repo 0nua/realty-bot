@@ -77,6 +77,14 @@ export default class TgBot {
         return id;
     }
 
+    async unsubscribe(settings: Settings, chatId: number): Promise<boolean> {
+        delete settings[chatId];
+
+        await this.updateSettings(settings);
+
+        return await this.deleteCollection(chatId);
+    }
+
     async checkUpdates(): Promise<any> {
         let settings: Settings = await this.getSettings();
 
@@ -88,10 +96,16 @@ export default class TgBot {
             let messages = [];
             for (let item of data.newest) {
                 messages.push(this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.id}`));
-                console.log({url: item.id, price: item.price, chatId: chatId});
             }
 
-            await Promise.all(messages);
+            try {
+                await Promise.all(messages);
+            } catch (err: any) {
+                console.error(err);
+                if (err.message.includes('bot was blocked by the user')) {
+                    await this.unsubscribe(settings, chatId);
+                }
+            }
         }
 
         console.log({chatId: chatId, result: Object.keys(data.result).length, new: data.newest.length})
@@ -138,6 +152,10 @@ export default class TgBot {
         return this.yaDisk.update('/realty-bot/config.json', settings);
     }
 
+    deleteCollection(chatId: number): Promise<boolean> {
+        return this.yaDisk.delete(`/realty-bot/collection_${chatId}.json`);
+    }
+
     getConfigureKeyboard() {
         return Markup.inlineKeyboard(
             [
@@ -166,9 +184,7 @@ export default class TgBot {
         this.bot.command('stop', async ctx => {
             let settings = await this.getSettings();
 
-            delete settings[ctx.chat.id];
-
-            await this.updateSettings(settings);
+            await this.unsubscribe(settings, ctx.chat.id);
 
             await ctx.reply('Subscribe was rejected! Goodbye!');
         });
@@ -218,13 +234,17 @@ export default class TgBot {
 
             await this.updateSettings(settings);
 
-            await this.yaDisk.delete(`/realty-bot/collection_${ctx.chat.id}.json`);
+            await this.deleteCollection(ctx.chat.id);
 
-            await ctx.editMessageReplyMarkup(
-                {
-                    inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
-                }
-            );
+            try {
+                await ctx.editMessageReplyMarkup(
+                    {
+                        inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
+                    }
+                );
+            } catch (err) {
+                await ctx.answerCbQuery();
+            }
         });
 
         this.bot.command('status', async ctx => {
@@ -272,7 +292,7 @@ export default class TgBot {
             await ctx.reply(
                 `Your chat id is ${ctx.chat.id}` + "\n" +
                 `Subcribed users: ${count}` + "\n" +
-                `Notification frequency ~ every ${5 * count} min`,
+                `Notification frequency ~ every ${10 * count} min`,
                 Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
             );
         });
@@ -286,7 +306,7 @@ export default class TgBot {
         });
 
         this.bot.catch((err: any, ctx: any) => {
-            console.log(err);
+            console.error(err);
             ctx.reply(`Something went wrong. Please, try again`);
         });
     }
