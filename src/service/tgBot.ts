@@ -77,6 +77,14 @@ export default class TgBot {
         return id;
     }
 
+    async unsubscribe(settings: Settings, chatId: number): Promise<boolean> {
+        delete settings[chatId];
+
+        await this.updateSettings(settings);
+
+        return await this.deleteCollection(chatId);
+    }
+
     async checkUpdates(): Promise<any> {
         let settings: Settings = await this.getSettings();
 
@@ -90,7 +98,14 @@ export default class TgBot {
                 messages.push(this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.id}`));
             }
 
-            await Promise.all(messages);
+            try {
+                await Promise.all(messages);
+            } catch (err: any) {
+                console.error(err);
+                if (err.message.includes('bot was blocked by the user')) {
+                    await this.unsubscribe(settings, chatId);
+                }
+            }
         }
 
         console.log({chatId: chatId, result: Object.keys(data.result).length, new: data.newest.length})
@@ -169,11 +184,7 @@ export default class TgBot {
         this.bot.command('stop', async ctx => {
             let settings = await this.getSettings();
 
-            delete settings[ctx.chat.id];
-
-            await this.updateSettings(settings);
-
-            await this.deleteCollection(ctx.chat.id);
+            await this.unsubscribe(settings, ctx.chat.id);
 
             await ctx.reply('Subscribe was rejected! Goodbye!');
         });
@@ -281,7 +292,7 @@ export default class TgBot {
             await ctx.reply(
                 `Your chat id is ${ctx.chat.id}` + "\n" +
                 `Subcribed users: ${count}` + "\n" +
-                `Notification frequency ~ every ${5 * count} min`,
+                `Notification frequency ~ every ${10 * count} min`,
                 Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
             );
         });
