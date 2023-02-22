@@ -46,38 +46,45 @@ export default class TgBot {
     async getChatId(settings: Settings): Promise<number> {
         let queue: object = await this.yaDisk.get('/realty-bot/queue.json');
 
-        let array = [];
-        for (let chatId in settings) {
-            if (chatId === 'chatIds') {
+        //Add new chats
+        let subscribers = Object.keys(settings);
+        for (let index = 0; index < subscribers.length; index++) {
+            let chatId = subscribers[index];
+            if (queue.hasOwnProperty(chatId) === false) {
+                queue[chatId] = (new Date()).getTime();
+            }
+        }
+
+        let id: number = 0;
+        let tempUsage: number = 0;
+        let toDelete: number[] = [];
+        for (let chatId in queue) {
+            if (subscribers.includes(chatId) === false) {
+                toDelete.push(Number.parseInt(chatId));
                 continue;
             }
 
-            let data = settings[chatId];
-            array.push(
-                {
-                    id: chatId,
-                    lastDate: data.lastDate
-                }
-            );
-        }
-
-        let chat = array.sort((a: any, b: any) => {
-            if (a.lastDate > b.lastDate) {
-                return -1;
+            let lastUsage = queue[chatId];
+            if (tempUsage === 0 || lastUsage <= tempUsage) {
+                tempUsage = lastUsage;
+                id = Number.parseInt(chatId);
             }
-
-            return a.lastDate < b.lastDate ? 1 : 0;
-        }).pop();
-
-        let id = chat ? Number.parseInt(chat.id) : 0;
-
-        if (id > 0) {
-            settings[id].lastDate = (new Date()).getTime();
-            await this.updateSettings(settings);
-
-            queue[id] = (new Date()).getTime();
-            await this.yaDisk.update('/realty-bot/queue.json', queue);
         }
+
+        if (id === 0) {
+            throw new Error('Chat id not found');
+        }
+
+        //Delete old chats
+        for (let index in toDelete) {
+            let chatId = toDelete[index];
+            delete queue[chatId];
+        }
+
+        //Update usage
+        queue[id] = (new Date()).getTime();
+
+        await this.yaDisk.update('/realty-bot/queue.json', queue);
 
         return id;
     }
@@ -92,9 +99,7 @@ export default class TgBot {
 
     async checkUpdates(): Promise<any> {
         let settings: Settings = await this.getSettings();
-
         let chatId = await this.getChatId(settings);
-
         let collector = new Collector(chatId, settings[chatId].filters);
         let data = await collector.getData();
         if (data.newest.length > 0) {
@@ -212,7 +217,7 @@ export default class TgBot {
             let name = ctx.match[2];
 
             if (settings.hasOwnProperty(ctx.chat.id) === false) {
-                settings[ctx.chat.id] = {filters: {house: [], flat: []}, lastDate: (new Date()).getTime()};
+                settings[ctx.chat.id] = {filters: {house: [], flat: []}};
             }
 
             let filters = settings[ctx.chat.id].filters[type] || [];
