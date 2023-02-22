@@ -44,6 +44,8 @@ export default class TgBot {
     }
 
     async getChatId(settings: Settings): Promise<number> {
+        let queue: object = await this.yaDisk.get('/realty-bot/queue.json');
+
         let array = [];
         for (let chatId in settings) {
             if (chatId === 'chatIds') {
@@ -72,6 +74,9 @@ export default class TgBot {
         if (id > 0) {
             settings[id].lastDate = (new Date()).getTime();
             await this.updateSettings(settings);
+
+            queue[id] = (new Date()).getTime();
+            await this.yaDisk.update('/realty-bot/queue.json', queue);
         }
 
         return id;

@@ -54,7 +54,7 @@ export default class Base {
 
             await new Promise(resolve => setTimeout(resolve, 0.5 * 1000)); //sleep 0.5 sec
 
-        } while (this.withPages && page < 50);
+        } while (this.withPages && page < 20);
 
         return result;
     }
