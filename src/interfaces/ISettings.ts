@@ -3,10 +3,9 @@ export interface Filters {
     house: string[],
 }
 
-export interface Settings {
-    chatIds: number[],
-
+export interface ISettings {
     [id: number]: {
         filters: Filters,
+        lastUsage?: number
     }
 }

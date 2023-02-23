@@ -1,10 +1,10 @@
 import {Markup, Telegraf} from 'telegraf';
-import fs from 'fs';
 import YaDisk from './yaDisk';
 import Collector from './collector';
-import {Filters, Settings} from "../interfaces/settings";
+import {Filters, ISettings} from "../interfaces/ISettings";
 import Data from "../interfaces/collectorData";
 import Queue from "./queue";
+import Settings from "./settings";
 
 export default class TgBot {
 
@@ -12,11 +12,13 @@ export default class TgBot {
     yaDisk: YaDisk;
     buttons: object;
     queue: Queue;
+    settings: Settings
 
     constructor() {
         this.yaDisk = new YaDisk();
         this.bot = new Telegraf(process.env.TG_BOT_TOKEN || 'null');
         this.queue = new Queue();
+        this.settings = new Settings();
         this.buttons = {
             newly: 'Newly',
             pets: 'With pets',
@@ -53,16 +55,16 @@ export default class TgBot {
         return this.bot.telegram.setWebhook(link);
     }
 
-    async unsubscribe(settings: Settings, chatId: number): Promise<boolean> {
+    async unsubscribe(settings: ISettings, chatId: number): Promise<boolean> {
         delete settings[chatId];
 
-        await this.updateSettings(settings);
+        await this.settings.update(settings);
 
         return await this.deleteCollection(chatId);
     }
 
     async checkUpdates(): Promise<any> {
-        let settings: Settings = await this.getSettings();
+        let settings: ISettings = await this.settings.get();
 
         let chatId = await this.queue.process(Object.keys(settings));
 
@@ -129,14 +131,6 @@ export default class TgBot {
         return keyboard;
     }
 
-    async getSettings(): Promise<Settings> {
-        return this.yaDisk.get('/realty-bot/config.json');
-    }
-
-    async updateSettings(settings: Settings): Promise<boolean> {
-        return this.yaDisk.update('/realty-bot/config.json', settings);
-    }
-
     deleteCollection(chatId: number): Promise<boolean> {
         return this.yaDisk.delete(`/realty-bot/collection_${chatId}.json`);
     }
@@ -155,6 +149,30 @@ export default class TgBot {
         );
     }
 
+    async updateFilters(ctx: any, repeat: boolean = true): Promise<boolean> {
+        try {
+            let type = ctx.match[1];
+            let name = ctx.match[2];
+
+            let settings = await this.settings.processFilter(ctx.chat.id, type, name);
+
+            await this.settings.update(settings);
+            await ctx.editMessageReplyMarkup(
+                {
+                    inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
+                }
+            );
+            await this.deleteCollection(ctx.chat.id);
+            return true;
+        } catch (err) {
+            if (repeat) {
+                return await this.updateFilters(ctx, false);
+            }
+            ctx.answerCbQuery();
+            return false;
+        }
+    }
+
     init(): void {
         this.bot.command(['start', 'configure'], ctx => {
             ctx.reply('What kind of realty do you need?', this.getConfigureKeyboard());
@@ -167,7 +185,7 @@ export default class TgBot {
         this.bot.action('close', ctx => ctx.deleteMessage());
 
         this.bot.command('stop', async ctx => {
-            let settings = await this.getSettings();
+            let settings = await this.settings.get();
 
             await this.unsubscribe(settings, ctx.chat.id);
 
@@ -176,7 +194,7 @@ export default class TgBot {
 
         this.bot.action(/realty-(.+)/, async (ctx: any) => {
             let type = ctx.match[1];
-            let settings = await this.getSettings();
+            let settings = await this.settings.get();
             let filters: Filters = settings[ctx.chat.id]?.filters || {};
 
             ctx.editMessageText(
@@ -186,54 +204,11 @@ export default class TgBot {
         });
 
         this.bot.action(/filter-(flat|house)-(.+)/, async (ctx: any) => {
-            let settings = await this.getSettings();
-
-            let type = ctx.match[1];
-            let name = ctx.match[2];
-
-            if (settings.hasOwnProperty(ctx.chat.id) === false) {
-                settings[ctx.chat.id] = {filters: {house: [], flat: []}};
-            }
-
-            let filters = settings[ctx.chat.id].filters[type] || [];
-
-            if (name.includes('-')) {
-                let [alias, value] = name.split('-');
-                filters = filters.filter((item: string) => !item.includes(alias) || item === name);
-            }
-
-            if (filters.indexOf(name) === -1) {
-                filters.push(name);
-            } else {
-                filters = filters.filter((item: string) => item !== name);
-            }
-
-            settings[ctx.chat.id].filters[type] = filters;
-
-            let houseFilters = settings[ctx.chat.id].filters.house;
-            let flatFilters = settings[ctx.chat.id].filters.flat;
-
-            if (houseFilters.length === 0 && flatFilters.length === 0) {
-                delete settings[ctx.chat.id];
-            }
-
-            await this.updateSettings(settings);
-
-            await this.deleteCollection(ctx.chat.id);
-
-            try {
-                await ctx.editMessageReplyMarkup(
-                    {
-                        inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
-                    }
-                );
-            } catch (err) {
-                await ctx.answerCbQuery();
-            }
+            await this.updateFilters(ctx);
         });
 
         this.bot.command('status', async ctx => {
-            let settings = await this.getSettings();
+            let settings = await this.settings.get();
 
             if (settings.hasOwnProperty(ctx.chat.id)) {
                 let collector = new Collector(ctx.chat.id, settings[ctx.chat.id].filters);
@@ -271,21 +246,26 @@ export default class TgBot {
         });
 
         this.bot.command('/admin', async ctx => {
-            let settings = await this.getSettings();
-            let count = Object.keys(settings).filter(item => item !== 'chatIds').length;
+            let queue = await this.queue.getQueue();
+            let count = Object.keys(queue).length;
 
             await ctx.reply(
                 `Your chat id is ${ctx.chat.id}` + "\n" +
-                `Subcribed users: ${count}` + "\n" +
+                `Subcribers: ${count}` + "\n" +
                 `Notification frequency ~ every ${10 * count} min`,
                 Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
             );
         });
 
         this.bot.command('/data', async ctx => {
-            let settings = await this.getSettings();
+            let settings = await this.settings.get();
+            let queue = await this.queue.getQueue();
             await ctx.reply(
-                `Settings: ${JSON.stringify(settings)}`,
+                `Settings: ${JSON.stringify(settings, null, 2)}`,
+                Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
+            );
+            await ctx.reply(
+                `Queue: ${JSON.stringify(queue, null, 2)}`,
                 Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
             );
         });
