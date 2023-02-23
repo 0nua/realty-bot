@@ -21,6 +21,8 @@ export class Ingatlan extends Base {
             newly: 'uj-epitesu',
             location: 'budapest',
             balcony: '1-m2erkely-felett',
+            furnished: 'butorozott',
+            condi: 'van-legkondi'
         };
 
         let min = null,

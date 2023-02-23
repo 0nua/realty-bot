@@ -17,13 +17,22 @@ export default class TgBot {
         this.buttons = {
             newly: 'New build',
             pets: 'Pets friendly',
+            condi: 'Air conditioning',
+            furnished: 'Furnished',
             "room-2": 'Min. 2 rooms',
             "room-3": 'Min. 3 rooms',
             "room-4": 'Min. 4 rooms',
-            "price-100": 'Min. 100th Ft/month',
-            "price-300": 'Min. 300th Ft/month',
-            "max-500": 'Max. 500th Ft/month',
-            "max-700": 'Max. 700th Ft/month'
+            "price-150": 'Min 150th Ft/month',
+            "price-200": 'Min 200th Ft/month',
+            "price-250": 'Min 250th Ft/month',
+            "price-300": 'Min 300th Ft/month',
+            "price-350": 'Min 350th Ft/month',
+            "max-200": 'Max 200th Ft/month',
+            "max-250": 'Max 250th Ft/month',
+            "max-300": 'Max 300th Ft/month',
+            "max-350": 'Max 350th Ft/month',
+            "max-400": 'Max 400th Ft/month',
+            "max-500": 'Max 500th Ft/month',
         };
 
         this.init();
