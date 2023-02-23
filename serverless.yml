@@ -29,6 +29,7 @@ functions:
                     path: /link
     webhook:
         handler: dist/handler/webhook.handle
+        timeout: 30
         events:
             -   http:
                     method: post
