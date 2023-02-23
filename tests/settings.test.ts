@@ -6,7 +6,7 @@ function getMockWithFilters(filters: Filters) {
     let mock = {
         1: {
             filters: filters,
-            lastUsage: 123,
+            lastDate: 123,
         }
     }
 
@@ -26,7 +26,7 @@ test('Test subscribtion', async () => {
     let updated = await settings.processFilter(1, 'flat', 'pets');
 
     expect(updated[1].filters.flat).toEqual(['pets']);
-    expect(updated[1].hasOwnProperty('lastUsage')).toBeFalsy();
+    expect(updated[1].hasOwnProperty('lastDate')).toBeFalsy();
 })
 
 test('Test add filter', async () => {
@@ -34,7 +34,7 @@ test('Test add filter', async () => {
     let updated = await mock.processFilter(1, 'flat', 'pets');
 
     expect(updated[1].filters.flat).toEqual(['newly', 'pets']);
-    expect(updated[1].hasOwnProperty('lastUsage')).toBeFalsy();
+    expect(updated[1].hasOwnProperty('lastDate')).toBeFalsy();
 });
 
 test('Test remove filter', async () => {
@@ -42,7 +42,7 @@ test('Test remove filter', async () => {
     let updated = await mock.processFilter(1, 'flat', 'pets');
 
     expect(updated[1].filters.flat).toEqual([]);
-    expect(updated[1].hasOwnProperty('lastUsage')).toBeFalsy();
+    expect(updated[1].hasOwnProperty('lastDate')).toBeFalsy();
 });
 
 test('Test unsubscription', async () => {
@@ -58,5 +58,5 @@ test('Test add/remove one type filter', async () => {
 
     expect(updated[1].filters.flat.includes('price-100')).toBeFalsy();
     expect(updated[1].filters.flat.includes('price-200')).toBeTruthy();
-    expect(updated[1].hasOwnProperty('lastUsage')).toBeFalsy();
+    expect(updated[1].hasOwnProperty('lastDate')).toBeFalsy();
 });
