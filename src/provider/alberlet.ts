@@ -20,7 +20,9 @@ export class Alberlet extends Base {
             flat: 'ingatlan-tipus:lakas',
             location: 'megye:budapest',
             balcony: 'erkely:igen',
-            newly: 'ujszeru:igen'
+            newly: 'ujszeru:igen',
+            furnished: 'berendezes:2',
+            condi: 'klima:igen'
         };
 
         let min = '0',

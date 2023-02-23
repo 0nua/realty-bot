@@ -15,15 +15,22 @@ export default class TgBot {
         this.yaDisk = new YaDisk();
         this.bot = new Telegraf(process.env.TG_BOT_TOKEN || 'null');
         this.buttons = {
-            newly: 'New build',
-            pets: 'Pets friendly',
+            newly: 'Newly',
+            pets: 'With pets',
+            condi: 'Air conditioning',
+            furnished: 'Furnished',
+            balcony: 'Balcony',
             "room-2": 'Min. 2 rooms',
             "room-3": 'Min. 3 rooms',
             "room-4": 'Min. 4 rooms',
-            "price-100": 'Min. 100th Ft/month',
-            "price-300": 'Min. 300th Ft/month',
-            "max-500": 'Max. 500th Ft/month',
-            "max-700": 'Max. 700th Ft/month'
+            "price-150": 'Min 150th',
+            "price-200": 'Min 200th',
+            "price-250": 'Min 250th',
+            "price-300": 'Min 300th',
+            "max-250": 'Max 250th',
+            "max-350": 'Max 350th',
+            "max-400": 'Max 400th',
+            "max-500": 'Max 500th',
         };
 
         this.init();
@@ -128,8 +135,8 @@ export default class TgBot {
         let typeFilters = filters[type] ?? [];
 
         let buttons = {...this.buttons};
-        if (type === 'flat') {
-            buttons['balcony'] = 'With balcony';
+        if (type !== 'flat') {
+            delete buttons['balcony'];
         }
 
         let nextType = type === 'flat' ? 'house' : 'flat';
@@ -141,14 +148,22 @@ export default class TgBot {
             [Markup.button.callback('Close', 'close')]
         ];
 
+        let row = [];
         for (let alias in buttons) {
-            keyboard.unshift(
-                [
-                    Markup.button.callback(
-                        `${buttons[alias]} ${typeFilters.includes(alias) ? '+' : ''}`, `filter-${type}-${alias}`
-                    )
-                ]
-            )
+            row.push(
+                Markup.button.callback(
+                    `${buttons[alias]} ${typeFilters.includes(alias) ? '+' : ''}`, `filter-${type}-${alias}`
+                )
+            );
+
+            if (row.length === 2) {
+                keyboard.unshift([...row]);
+                row = [];
+            }
+        }
+
+        if (row.length > 0) {
+            keyboard.unshift([...row]);
         }
 
         return keyboard;
