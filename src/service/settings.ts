@@ -49,8 +49,8 @@ export default class Settings {
             delete settings[chatId];
         }
 
-        if (settings[chatId]?.lastUsage) {
-            delete settings[chatId].lastUsage;
+        if (settings[chatId]?.lastDate) {
+            delete settings[chatId].lastDate;
         }
 
         return settings;

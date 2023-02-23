@@ -6,6 +6,6 @@ export interface Filters {
 export interface ISettings {
     [id: number]: {
         filters: Filters,
-        lastUsage?: number
+        lastDate?: number
     }
 }
