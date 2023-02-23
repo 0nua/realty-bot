@@ -157,6 +157,10 @@ export default class TgBot {
             }
         }
 
+        if (row.length > 0) {
+            keyboard.unshift([...row]);
+        }
+
         return keyboard;
     }
 
