@@ -1,4 +1,4 @@
-import TgBot from "../service/tgBot";
+import TgBot from "../src/service/tgBot";
 
 test('TgBot filters keyboard', () => {
     let keyboard = (new TgBot()).getFiltersKeyboard('flat', {

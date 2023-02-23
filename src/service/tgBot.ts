@@ -4,16 +4,19 @@ import YaDisk from './yaDisk';
 import Collector from './collector';
 import {Filters, Settings} from "../interfaces/settings";
 import Data from "../interfaces/collectorData";
+import Queue from "./queue";
 
 export default class TgBot {
 
     bot: Telegraf;
     yaDisk: YaDisk;
-    buttons: object
+    buttons: object;
+    queue: Queue;
 
     constructor() {
         this.yaDisk = new YaDisk();
         this.bot = new Telegraf(process.env.TG_BOT_TOKEN || 'null');
+        this.queue = new Queue();
         this.buttons = {
             newly: 'Newly',
             pets: 'With pets',
@@ -50,45 +53,6 @@ export default class TgBot {
         return this.bot.telegram.setWebhook(link);
     }
 
-    async getChatId(settings: Settings): Promise<number> {
-        let queue: object = await this.yaDisk.get('/realty-bot/queue.json');
-
-        let array = [];
-        for (let chatId in settings) {
-            if (chatId === 'chatIds') {
-                continue;
-            }
-
-            let data = settings[chatId];
-            array.push(
-                {
-                    id: chatId,
-                    lastDate: data.lastDate
-                }
-            );
-        }
-
-        let chat = array.sort((a: any, b: any) => {
-            if (a.lastDate > b.lastDate) {
-                return -1;
-            }
-
-            return a.lastDate < b.lastDate ? 1 : 0;
-        }).pop();
-
-        let id = chat ? Number.parseInt(chat.id) : 0;
-
-        if (id > 0) {
-            settings[id].lastDate = (new Date()).getTime();
-            await this.updateSettings(settings);
-
-            queue[id] = (new Date()).getTime();
-            await this.yaDisk.update('/realty-bot/queue.json', queue);
-        }
-
-        return id;
-    }
-
     async unsubscribe(settings: Settings, chatId: number): Promise<boolean> {
         delete settings[chatId];
 
@@ -100,9 +64,10 @@ export default class TgBot {
     async checkUpdates(): Promise<any> {
         let settings: Settings = await this.getSettings();
 
-        let chatId = await this.getChatId(settings);
+        let chatId = await this.queue.process(Object.keys(settings));
 
         let collector = new Collector(chatId, settings[chatId].filters);
+
         let data = await collector.getData();
         if (data.newest.length > 0) {
             let messages = [];
@@ -227,7 +192,7 @@ export default class TgBot {
             let name = ctx.match[2];
 
             if (settings.hasOwnProperty(ctx.chat.id) === false) {
-                settings[ctx.chat.id] = {filters: {house: [], flat: []}, lastDate: (new Date()).getTime()};
+                settings[ctx.chat.id] = {filters: {house: [], flat: []}};
             }
 
             let filters = settings[ctx.chat.id].filters[type] || [];

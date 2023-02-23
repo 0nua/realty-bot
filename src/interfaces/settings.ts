@@ -8,6 +8,5 @@ export interface Settings {
 
     [id: number]: {
         filters: Filters,
-        lastDate: number
     }
 }
