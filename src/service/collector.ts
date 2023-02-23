@@ -6,7 +6,7 @@ import {RentWithPaws} from '../provider/rentWithPaws';
 import {Alberlet} from '../provider/alberlet';
 import Item from '../interfaces/providerItem';
 import Data from '../interfaces/collectorData';
-import {Filters} from "../interfaces/settings";
+import {Filters} from "../interfaces/ISettings";
 
 export default class Collector {
 

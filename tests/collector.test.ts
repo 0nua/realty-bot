@@ -1,5 +1,5 @@
 import Collector from '../src/service/collector';
-import {Filters} from "../src/interfaces/settings";
+import {Filters} from "../src/interfaces/ISettings";
 
 test('Links with filters', () => {
     let filters: Filters = {
