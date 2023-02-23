@@ -15,6 +15,7 @@ provider:
 package:
     patterns:
         - '!src/**'
+        - '!tests/**'
 
 plugins:
     - serverless-offline
