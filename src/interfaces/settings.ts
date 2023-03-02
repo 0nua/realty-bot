@@ -3,7 +3,7 @@ export interface Filters {
     house: string[],
 }
 
-export interface ISettings {
+export interface SettingsInterface {
     [id: number]: {
         filters: Filters,
         lastDate?: number

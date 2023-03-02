@@ -2,7 +2,7 @@ import RequestWrapper from "../service/requestWrapper";
 import axios from 'axios';
 import parser from 'node-html-parser';
 import crypto from 'crypto';
-import Item from '../interfaces/providerItem'
+import ProviderItemInterface from '../interfaces/providerItem'
 
 export default class Base {
 
@@ -63,7 +63,7 @@ export default class Base {
         throw new Error('Not implemented');
     }
 
-    parse(card: any): Item | null {
+    parse(card: any): ProviderItemInterface | null {
         throw new Error('Not implemented');
     }
 

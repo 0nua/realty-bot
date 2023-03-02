@@ -4,9 +4,9 @@ import Base from '../provider/base';
 import {Ingatlan} from '../provider/ingatlan';
 import {RentWithPaws} from '../provider/rentWithPaws';
 import {Alberlet} from '../provider/alberlet';
-import Item from '../interfaces/providerItem';
-import Data from '../interfaces/collectorData';
-import {Filters} from "../interfaces/ISettings";
+import ProviderItemInterface from '../interfaces/providerItem';
+import CollectorDataInterface from '../interfaces/collectorData';
+import {Filters} from "../interfaces/settings";
 
 export default class Collector {
 
@@ -40,7 +40,7 @@ export default class Collector {
         return this.yaDisk.update(`/realty-bot/collection_${this.chatId}.json`, collection);
     }
 
-    async getData(): Promise<Data> {
+    async getData(): Promise<CollectorDataInterface> {
         let result = {};
         let promises = [];
         for (let provider of this.providers) {
@@ -50,7 +50,7 @@ export default class Collector {
 
         await Promise.all(promises);
 
-        let newest: Item[] = [];
+        let newest: ProviderItemInterface[] = [];
         let collection = await this.getCollection();
         let firstTime = collection.length === 0;
 

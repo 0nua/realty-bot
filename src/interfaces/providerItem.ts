@@ -1,4 +1,4 @@
-export default interface Item {
+export default interface ProviderItemInterface {
     id: string,
     price: string,
     address: string

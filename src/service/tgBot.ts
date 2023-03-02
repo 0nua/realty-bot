@@ -1,8 +1,8 @@
 import {Markup, Telegraf} from 'telegraf';
 import YaDisk from './yaDisk';
 import Collector from './collector';
-import {Filters, ISettings} from "../interfaces/ISettings";
-import Data from "../interfaces/collectorData";
+import {Filters, SettingsInterface} from "../interfaces/settings";
+import CollectorDataInterface from "../interfaces/collectorData";
 import Queue from "./queue";
 import Settings from "./settings";
 
@@ -55,7 +55,7 @@ export default class TgBot {
         return this.bot.telegram.setWebhook(link);
     }
 
-    async unsubscribe(settings: ISettings, chatId: number): Promise<boolean> {
+    async unsubscribe(settings: SettingsInterface, chatId: number): Promise<boolean> {
         delete settings[chatId];
 
         await this.settings.update(settings);
@@ -64,7 +64,7 @@ export default class TgBot {
     }
 
     async checkUpdates(): Promise<any> {
-        let settings: ISettings = await this.settings.get();
+        let settings: SettingsInterface = await this.settings.get();
 
         let chatId = await this.queue.process(Object.keys(settings));
 

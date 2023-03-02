@@ -1,5 +1,5 @@
 import Settings from "../src/service/settings";
-import {Filters} from "../src/interfaces/ISettings";
+import {Filters} from "../src/interfaces/settings";
 
 function getMockWithFilters(filters: Filters) {
     let settings = new Settings();

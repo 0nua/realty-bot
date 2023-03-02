@@ -1,4 +1,4 @@
-import {ISettings} from "../interfaces/ISettings";
+import {SettingsInterface} from "../interfaces/settings";
 import YaDisk from "./yaDisk";
 
 export default class Settings {
@@ -9,11 +9,11 @@ export default class Settings {
         this.yaDisk = new YaDisk();
     }
 
-    async get(): Promise<ISettings> {
+    async get(): Promise<SettingsInterface> {
         return this.yaDisk.get('/realty-bot/config.json');
     }
 
-    async update(settings: ISettings): Promise<boolean> {
+    async update(settings: SettingsInterface): Promise<boolean> {
         if (settings.hasOwnProperty('chatIds')) {
             delete settings['chatIds'];
         }
@@ -21,7 +21,7 @@ export default class Settings {
         return this.yaDisk.update('/realty-bot/config.json', settings);
     }
 
-    async processFilter(chatId: number, type: string, name: string): Promise<ISettings> {
+    async processFilter(chatId: number, type: string, name: string): Promise<SettingsInterface> {
         let settings = await this.get();
         if (settings.hasOwnProperty(chatId) === false) {
             settings[chatId] = {filters: {house: [], flat: []}};

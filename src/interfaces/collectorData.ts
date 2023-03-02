@@ -1,6 +1,6 @@
-import Item from "./providerItem";
+import ProviderItemInterface from "./providerItem";
 
-export default interface Data {
+export default interface CollectorDataInterface {
     result: object,
-    newest: Item[]
+    newest: ProviderItemInterface[]
 }
