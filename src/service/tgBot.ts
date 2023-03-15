@@ -252,7 +252,7 @@ export default class TgBot {
             await ctx.reply(
                 `Your chat id is ${ctx.chat.id}` + "\n" +
                 `Subcribers: ${count}` + "\n" +
-                `Notification frequency ~ every ${10 * count} min`,
+                `Notification frequency ~ every ${5 * count} min`,
                 Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
             );
         });
@@ -260,10 +260,6 @@ export default class TgBot {
         this.bot.command('/data', async ctx => {
             let settings = await this.settings.get();
             let queue = await this.queue.getQueue();
-            await ctx.reply(
-                `Settings: ${JSON.stringify(settings, null, 2)}`,
-                Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
-            );
             await ctx.reply(
                 `Queue: ${JSON.stringify(queue, null, 2)}`,
                 Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
