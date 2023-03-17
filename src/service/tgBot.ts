@@ -5,6 +5,7 @@ import {Filters, SettingsInterface} from "../interfaces/settings";
 import CollectorDataInterface from "../interfaces/collectorData";
 import Queue from "./queue";
 import Settings from "./settings";
+import ErrorHandler from "./errorHandler";
 
 export default class TgBot {
 
@@ -80,14 +81,15 @@ export default class TgBot {
             try {
                 await Promise.all(messages);
             } catch (err: any) {
-                console.error(err);
+                await ErrorHandler.log(err);
+
                 if (err.message.includes('bot was blocked by the user')) {
                     await this.unsubscribe(settings, chatId);
                 }
             }
         }
 
-        console.log({chatId: chatId, result: Object.keys(data.result).length, new: data.newest.length})
+        console.log({chatId: chatId, result: Object.keys(data.result).length, new: data.newest.length});
 
         return data;
     }
@@ -257,6 +259,10 @@ export default class TgBot {
             );
         });
 
+        this.bot.command('/error', ctx => {
+            throw new Error('Test error logging');
+        });
+
         this.bot.command('/data', async ctx => {
             let settings = await this.settings.get();
             let queue = await this.queue.getQueue();
@@ -266,9 +272,9 @@ export default class TgBot {
             );
         });
 
-        this.bot.catch((err: any, ctx: any) => {
-            console.error(err);
-            ctx.reply(`Something went wrong. Please, try again`);
+        this.bot.catch(async (err: any, ctx: any) => {
+            await ErrorHandler.log(err);
+            await ctx.reply(`Something went wrong. Please, try again`);
         });
     }
 }

@@ -1,3 +1,5 @@
+import ErrorHandler from "../service/errorHandler";
+
 const handler: any = require('serverless-express/handler');
 import app from '../app';
 
@@ -6,8 +8,8 @@ app.post('/webhook', (req: any, res: any) => {
         .then((result: boolean) => {
             return res.send(`Success: ${result}`);
         }).catch((err: Error) => {
-            console.error(err);
-            return res.status(500).send(`Failed: ${err.message}`);
+            return ErrorHandler.log(err)
+                .then(() => res.status(500).send(`Failed: ${err.message}`));
         });
 });
 
