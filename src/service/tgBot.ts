@@ -7,7 +7,7 @@ import Queue from "./queue";
 import Settings from "./settings";
 import ErrorHandler from "./errorHandler";
 
-export default class TgBot {
+class TgBot {
 
     bot: Telegraf;
     yaDisk: YaDisk;
@@ -247,6 +247,10 @@ export default class TgBot {
             );
         });
 
+        this.bot.command('/error', ctx => {
+            throw new Error('Test error');
+        });
+
         this.bot.command('/admin', async ctx => {
             let queue = await this.queue.getQueue();
             let count = Object.keys(queue).length;
@@ -265,3 +269,7 @@ export default class TgBot {
         });
     }
 }
+
+const tgBot = new TgBot();
+
+export default tgBot;

@@ -1,5 +1,4 @@
-import app from '../app';
-import {Telegram} from 'telegraf';
+import tgBot from "./tgBot";
 
 export default class ErrorHandler {
 
@@ -7,6 +6,6 @@ export default class ErrorHandler {
         console.error(error);
         let chatId = Number.parseInt(process.env.ADMIN_CHAT_ID ?? '0');
 
-        return app.tgBot.bot.telegram.sendMessage(chatId, `Error occured: ${error.message}`);
+        return tgBot.bot.telegram.sendMessage(chatId, `Error occured: ${error.message}`);
     }
 }

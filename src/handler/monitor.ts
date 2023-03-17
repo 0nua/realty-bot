@@ -1,9 +1,10 @@
 import app from '../app';
+import tgBot from "../service/tgBot";
 import ErrorHandler from "../service/errorHandler";
 
 let handle = async (event: any) => {
     try {
-        let data = await app.tgBot.checkUpdates();
+        let data = await tgBot.checkUpdates();
         return {
             statusCode: 200,
             body: JSON.stringify(data.result),

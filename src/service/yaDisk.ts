@@ -1,5 +1,4 @@
 import axios from 'axios';
-import ErrorHandler from "./errorHandler";
 
 export default class YaDisk {
     config: {
@@ -27,7 +26,7 @@ export default class YaDisk {
         } catch (err: any) {
             let status = err.response && err.response.status
             if (status !== 404) {
-                await ErrorHandler.log(err);
+                console.error(err);
             }
             return def;
         }
@@ -70,7 +69,7 @@ export default class YaDisk {
 
             return status === 'success';
         } catch (err) {
-            await ErrorHandler.log(err);
+            console.error(err);
             return false;
         }
     }
@@ -85,7 +84,7 @@ export default class YaDisk {
         } catch (err: any) {
             let status = err.response && err.response.status
             if (status !== 404) {
-                await ErrorHandler.log(err);
+                console.error(err);
                 return false;
             }
             return true;

@@ -1,10 +1,11 @@
-import ErrorHandler from "../service/errorHandler";
-
-const handler: any = require('serverless-express/handler');
 import app from '../app';
+import tgBot from "../service/tgBot";
+
+import ErrorHandler from "../service/errorHandler";
+const handler: any = require('serverless-express/handler');
 
 app.post('/webhook', (req: any, res: any) => {
-    return app.tgBot.process(req)
+    return tgBot.process(req)
         .then((result: boolean) => {
             return res.send(`Success: ${result}`);
         }).catch((err: Error) => {

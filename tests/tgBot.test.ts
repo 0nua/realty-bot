@@ -1,7 +1,7 @@
-import TgBot from "../src/service/tgBot";
+import tgBot from "../src/service/tgBot";
 
 test('TgBot filters keyboard', () => {
-    let keyboard = (new TgBot()).getFiltersKeyboard('flat', {
+    let keyboard = tgBot.getFiltersKeyboard('flat', {
         flat: ["max-500","pets","newly","room-3", "condi", "furnished"],
         house: ["price-150", "max-250", "pets", "condi", "furnished"]
     });
