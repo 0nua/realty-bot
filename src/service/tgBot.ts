@@ -259,19 +259,6 @@ export default class TgBot {
             );
         });
 
-        this.bot.command('/error', ctx => {
-            throw new Error('Test error logging');
-        });
-
-        this.bot.command('/data', async ctx => {
-            let settings = await this.settings.get();
-            let queue = await this.queue.getQueue();
-            await ctx.reply(
-                `Queue: ${JSON.stringify(queue, null, 2)}`,
-                Markup.inlineKeyboard([Markup.button.callback('Close', 'close')])
-            );
-        });
-
         this.bot.catch(async (err: any, ctx: any) => {
             await ErrorHandler.log(err);
             await ctx.reply(`Something went wrong. Please, try again`);
