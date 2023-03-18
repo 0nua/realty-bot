@@ -1,0 +1,15 @@
+Resources:
+    settings:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            TableName: settings
+            AttributeDefinitions:
+                -   AttributeName: chatId
+                    AttributeType: N
+            KeySchema:
+                -   AttributeName: chatId
+                    KeyType: HASH
+            BillingMode: PROVISIONED
+            ProvisionedThroughput:
+                ReadCapacityUnits: 5
+                WriteCapacityUnits: 5

@@ -12,6 +12,7 @@ provider:
         TG_BOT_TOKEN: ${env:TG_BOT_TOKEN}
         YA_TOKEN: ${env:YA_TOKEN}
         ADMIN_CHAT_ID: ${env:ADMIN_CHAT_ID}
+
 package:
     patterns:
         - '!src/**'
@@ -20,6 +21,9 @@ package:
 plugins:
     - serverless-offline
     - serverless-express
+
+resources:
+    - ${file(resources/settings-table.yml)}
 
 functions:
     link:
