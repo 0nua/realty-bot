@@ -1,3 +1,5 @@
+import Logger from "../service/logger";
+
 const handler = require('serverless-express/handler');
 import app from '../app';
 
@@ -6,9 +8,8 @@ app.get('/link', (req: any, res: any) => {
         .then((result: boolean) => {
             return res.send(`Success: ${result}`);
         }).catch((err: Error) => {
-            console.error(err);
-            return res.status(500)
-                .send(`Failed: ${err.message}`);
+            return Logger.log(err)
+                .then(() => res.status(500).send(`Failed: ${err.message}`));
         });
 });
 

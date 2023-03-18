@@ -1,4 +1,5 @@
 import app from '../app';
+import Logger from "../service/logger";
 
 let handle = async (event: any) => {
     try {
@@ -8,7 +9,7 @@ let handle = async (event: any) => {
             body: JSON.stringify(data.result),
         };
     } catch (err: any) {
-        console.error(err);
+        await Logger.log(err);
         return {
             statusCode: 500,
             error: err.message,
