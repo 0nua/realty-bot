@@ -7,6 +7,6 @@ export default class Logger {
 
     static async log(error: any): Promise<any> {
         console.error(error);
-        return Logger.telegraf.telegram.sendMessage(Logger.chatId, `Error occured: ${error.message}`);
+        return Logger.telegraf.telegram.sendMessage(Logger.chatId, `Error occurred: ${error.message}`);
     }
 }
