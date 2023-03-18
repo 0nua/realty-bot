@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Logger from "./logger";
 
 export default class YaDisk {
     config: {
@@ -26,7 +27,7 @@ export default class YaDisk {
         } catch (err: any) {
             let status = err.response && err.response.status
             if (status !== 404) {
-                console.error(err);
+                await Logger.log(err);
             }
             return def;
         }
@@ -69,7 +70,7 @@ export default class YaDisk {
 
             return status === 'success';
         } catch (err) {
-            console.error(err);
+            await Logger.log(err);
             return false;
         }
     }
@@ -84,7 +85,7 @@ export default class YaDisk {
         } catch (err: any) {
             let status = err.response && err.response.status
             if (status !== 404) {
-                console.error(err);
+                await Logger.log(err);
                 return false;
             }
             return true;

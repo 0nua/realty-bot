@@ -11,7 +11,7 @@ provider:
     environment:
         TG_BOT_TOKEN: ${env:TG_BOT_TOKEN}
         YA_TOKEN: ${env:YA_TOKEN}
-
+        ADMIN_CHAT_ID: ${env:ADMIN_CHAT_ID}
 package:
     patterns:
         - '!src/**'
