@@ -6,6 +6,7 @@ import CollectorDataInterface from "../interfaces/collectorData";
 import Queue from "./queue";
 import Settings from "./settings";
 import Logger from "./logger";
+import DynamoDB from './dynamodb';
 
 export default class TgBot {
 
@@ -13,10 +14,12 @@ export default class TgBot {
     yaDisk: YaDisk;
     buttons: object;
     queue: Queue;
-    settings: Settings
+    settings: Settings;
+    dynamoDB: DynamoDB;
 
     constructor() {
         this.yaDisk = new YaDisk();
+        this.dynamoDB = new DynamoDB();
         this.bot = new Telegraf(process.env.TG_BOT_TOKEN || 'null');
         this.queue = new Queue();
         this.settings = new Settings();
@@ -70,6 +73,11 @@ export default class TgBot {
         let chatId = await this.queue.process(Object.keys(settings));
 
         let collector = new Collector(chatId, settings[chatId].filters);
+
+        let added = await this.dynamoDB.put('settings', {chatId: chatId, filters: settings[chatId].filters});
+        if (!added) {
+            await Logger.log(new Error('Settings not added'));
+        }
 
         let data = await collector.getData();
         if (data.newest.length > 0) {
