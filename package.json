@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "build": "npm install",
-    "start": "tsc && serverless offline",
+    "start": "tsc && serverless offline --stage=test",
     "deploy": "rm -rf ./dist && tsc && serverless deploy",
     "compile": "tsc",
     "test": "jest"

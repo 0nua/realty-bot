@@ -8,10 +8,16 @@ provider:
     runtime: nodejs18.x
     region: eu-west-3
     versionFunctions: false
+    stage: dev
     environment:
         TG_BOT_TOKEN: ${env:TG_BOT_TOKEN}
         YA_TOKEN: ${env:YA_TOKEN}
         ADMIN_CHAT_ID: ${env:ADMIN_CHAT_ID}
+        APP_ENV: ${opt:stage, self:provider.stage}
+        AWS_PROJECT_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
+        AWS_PROJECT_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
+        AWS_PROJECT_REGION: ${env:AWS_REGION}
+
 package:
     patterns:
         - '!src/**'
