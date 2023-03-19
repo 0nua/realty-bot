@@ -52,7 +52,7 @@ export default class TgBot {
 
     setWebhook(req: any): Promise<boolean> {
         let event = req.apiGateway.event;
-        let link = `https://${event.requestContext.domainName}/dev/webhook`;
+        let link = req.query.link ?? `https://${event.requestContext.domainName}/dev/webhook`;
         return this.bot.telegram.setWebhook(link);
     }
 
