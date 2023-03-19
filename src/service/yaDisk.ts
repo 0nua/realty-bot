@@ -16,10 +16,10 @@ export default class YaDisk {
         };
     }
 
-    async get(path: string, def:any = {}): Promise<any> {
+    async get(path: string, def: any = {}): Promise<any> {
         try {
             let response = await axios.get(
-                `https://cloud-api.yandex.net/v1/disk/resources/download?path=${path}`,
+                `https://cloud-api.yandex.net/v1/disk/resources/download?path=${this.getEnvPath(path)}`,
                 this.config,
             );
             let content = await this.download(response.data.href);
@@ -47,7 +47,7 @@ export default class YaDisk {
     async update(path: string, data: object): Promise<boolean> {
         try {
             let upload = await axios.get(
-                `https://cloud-api.yandex.net/v1/disk/resources/upload?overwrite=true&path=${path}`,
+                `https://cloud-api.yandex.net/v1/disk/resources/upload?overwrite=true&path=${this.getEnvPath(path)}`,
                 this.config,
             );
 
@@ -78,7 +78,7 @@ export default class YaDisk {
     async delete(path: string): Promise<boolean> {
         try {
             let response = await axios.delete(
-                `https://cloud-api.yandex.net/v1/disk/resources?path=${path}`,
+                `https://cloud-api.yandex.net/v1/disk/resources?path=${this.getEnvPath(path)}`,
                 this.config,
             );
             return response.status === 204;
@@ -90,6 +90,14 @@ export default class YaDisk {
             }
             return true;
         }
+    }
+
+    getEnvPath(path: string): string {
+        let [dir, file] = path.slice(1).split('/');
+
+        let suffix = process.env.APP_ENV === 'test' ? '-test' : '';
+
+        return `/${dir}${suffix}/${file}`;
     }
 
 }
