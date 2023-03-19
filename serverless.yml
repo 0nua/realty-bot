@@ -8,6 +8,7 @@ provider:
     runtime: nodejs18.x
     region: eu-west-3
     versionFunctions: false
+    stage: dev
     environment:
         TG_BOT_TOKEN: ${env:TG_BOT_TOKEN}
         YA_TOKEN: ${env:YA_TOKEN}
