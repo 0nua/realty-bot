@@ -9,8 +9,8 @@ export default class DynamoDB {
         let client = new DynamoDBClient({
             region: process.env.AWS_PROJECT_REGION,
             credentials: {
-                accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || ''
+                accessKeyId: process.env.AWS_PROJECT_KEY || '',
+                secretAccessKey: process.env.AWS_PROJECT_SECRET || ''
             }
         });
 
