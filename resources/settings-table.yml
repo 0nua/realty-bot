@@ -11,5 +11,5 @@ Resources:
                     KeyType: HASH
             BillingMode: PROVISIONED
             ProvisionedThroughput:
-                ReadCapacityUnits: 5
-                WriteCapacityUnits: 5
+                ReadCapacityUnits: 3
+                WriteCapacityUnits: 3
