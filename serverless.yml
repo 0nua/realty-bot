@@ -24,6 +24,7 @@ package:
         - '!tests/**'
 
 plugins:
+    - serverless-dynamodb-local
     - serverless-offline
     - serverless-express
 
@@ -52,3 +53,10 @@ functions:
             -   http:
                     method: get
                     path: /monitor
+
+custom:
+    dynamodb:
+        stages:
+            - test
+        start:
+            migrate: true
