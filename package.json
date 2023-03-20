@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "npm install",
+    "install-app": "npm install && sls dynamodb install",
     "start": "tsc && serverless offline start --stage=test",
     "deploy": "rm -rf ./dist && tsc && serverless deploy",
     "compile": "tsc",
