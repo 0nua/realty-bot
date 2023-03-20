@@ -2,7 +2,7 @@
 
 `npm run start` will startup offline lambda app with dynamodb instance.
 
-For successful startup you need to install java on you machine.
+For successful startup you need to install java on your machine.
 
 `apt-get install openjdk-7-jre-headless`
 
