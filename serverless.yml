@@ -29,7 +29,7 @@ plugins:
     - serverless-express
 
 resources:
-    - ${file(resources/settings-table.yml)}
+    - ${file(config/resources.yml)}
 
 functions:
     link:
