@@ -6,13 +6,19 @@ export default class DynamoDB {
     db: DynamoDBDocumentClient
 
     constructor() {
-        let client = new DynamoDBClient({
+        let config = {
             region: process.env.AWS_PROJECT_REGION,
             credentials: {
                 accessKeyId: process.env.AWS_PROJECT_ACCESS_KEY_ID || '',
                 secretAccessKey: process.env.AWS_PROJECT_SECRET_ACCESS_KEY || ''
             }
-        });
+        };
+
+        if (process.env.APP_ENV === 'test') {
+            config['endpoint'] = 'http://localhost:8000';
+        }
+
+        let client = new DynamoDBClient(config);
 
         this.db = DynamoDBDocumentClient.from(client);
     }
