@@ -1,5 +1,7 @@
 import Collector from '../src/service/collector';
 import {Filters} from "../src/interfaces/settings";
+import {RentWithPaws} from "../src/provider/rentWithPaws";
+import {Ingatlan} from "../src/provider/ingatlan";
 
 test('Links with filters', () => {
     let filters: Filters = {
@@ -18,4 +20,37 @@ test('Links with filters', () => {
             'https://en.alberlet.hu/kiado_alberlet/page:1/haziallat-engedelyezve:igen/klima:igen/berendezes:2/ingatlan-tipus:haz/megye:budapest/berleti-dij:150-250-ezer-ft/limit:100'
         ]
     );
+});
+
+test('Test collector data fetching', async () => {
+    let filters: Filters = {
+        flat: ["max-500","pets","newly","room-3", "condi", "furnished"],
+        house: [],
+    };
+
+    let rentWithPawsProvider = new RentWithPaws();
+    jest.spyOn(rentWithPawsProvider, 'getData')
+        .mockImplementation(() => new Promise((resolve) => resolve({"hash": {id: 1, price: 1, address: "test"}})));
+
+    let rentWithPawsProvider2 = new RentWithPaws();
+    jest.spyOn(rentWithPawsProvider2, 'getData')
+        .mockImplementation(() => new Promise((resolve) => {throw new Error('Error from second provider')}));
+
+    let collector = new Collector(367825282, filters);
+    collector.providers = [rentWithPawsProvider, rentWithPawsProvider2];
+
+    jest.spyOn(collector, 'getCollection')
+        .mockImplementation(() => new Promise((resolve) => resolve([])));
+
+    jest.spyOn(collector, 'getCollection')
+        .mockImplementation(() => new Promise((resolve) => resolve([])));
+
+    jest.spyOn(collector, 'updateCollection')
+        .mockImplementation(() => new Promise((resolve) => resolve(true)));
+
+    let data = await collector.getData();
+
+    expect(Array.isArray(data.newest)).toBeTruthy();
+    expect(typeof data.result === 'object').toBeTruthy();
+    expect(data.result).toHaveProperty('hash');
 });
