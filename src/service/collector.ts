@@ -7,6 +7,7 @@ import {Alberlet} from '../provider/alberlet';
 import ProviderItemInterface from '../interfaces/providerItem';
 import CollectorDataInterface from '../interfaces/collectorData';
 import {Filters} from "../interfaces/settings";
+import Logger from './logger';
 
 export default class Collector {
 
@@ -44,7 +45,10 @@ export default class Collector {
         let result = {};
         let promises = [];
         for (let provider of this.providers) {
-            let promise = provider.getData().then(data => result = lodash.merge(result, data));
+            let promise = provider.getData()
+                .then(data => result = lodash.merge(result, data))
+                .catch(async err => Logger.log(err));
+
             promises.push(promise);
         }
 
