@@ -1,4 +1,5 @@
 import Base from './base';
+import ProviderItemInterface from "../interfaces/providerItem";
 
 export class RentWithPaws extends Base {
 
@@ -8,7 +9,7 @@ export class RentWithPaws extends Base {
         this.selector = 'div.property-item';
     }
 
-    parse(card: any) {
+    parse(card: any): ProviderItemInterface|null {
         let link = card.querySelector('.property-title > a');
 
         let date = card.querySelector('.property-date').text;
