@@ -7,7 +7,7 @@
     "start": "tsc && serverless offline --stage=test",
     "deploy": "rm -rf ./dist && tsc && serverless deploy",
     "compile": "tsc",
-    "test": "jest"
+    "test": "jest --silent"
   },
   "keywords": [],
   "author": "Vladimir Prisada",
