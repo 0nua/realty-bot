@@ -1,4 +1,5 @@
 import Base from "./base";
+import ProviderItemInterface from "../interfaces/providerItem";
 
 export class Alberlet extends Base {
 
@@ -53,7 +54,7 @@ export class Alberlet extends Base {
         return `https://en.alberlet.hu/kiado_alberlet/page:${page}/${filters.join('/')}/limit:${this.limit}`;
     }
 
-    parse(card: any) {
+    parse(card: any): ProviderItemInterface {
         return {
             id: `https://en.alberlet.hu${card.querySelector('> a').getAttribute('href')}`,
             price: card.querySelector('div.col').text.trim(),

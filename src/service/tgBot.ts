@@ -75,7 +75,7 @@ export default class TgBot {
         if (data.newest.length > 0) {
             let messages = [];
             for (let item of data.newest) {
-                messages.push(this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.id}`));
+                messages.push(this.bot.telegram.sendMessage(chatId, `${item.price}, ${item.address}, ${item.url ?? item.id}`));
             }
 
             try {
@@ -233,7 +233,7 @@ export default class TgBot {
 
         this.bot.command('about', ctx => {
             ctx.reply(
-                "I check updates on sites https://tappancsosotthon.hu, https://en.alberlet.hu and https://realestatehungary.hu" +
+                "I check updates on sites https://tappancsosotthon.hu, https://en.alberlet.hu and https://ingatlan.com" +
                 "\n\n" +
                 "Use command /configure for set up your filters. https://tappancsosotthon.hu does not have filters, " +
                 "so you will get all updates from it.\nFilter you have already selected will be marked by \"+\" symbol, " +

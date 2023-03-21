@@ -1,4 +1,5 @@
 import Base from './base';
+import ProviderItemInterface from "../interfaces/providerItem";
 
 export class Ingatlan extends Base {
 
@@ -55,12 +56,14 @@ export class Ingatlan extends Base {
             filters.push(`havi-${min}-ezer-Ft-tol`);
         }
 
-        return `https://realestatehungary.hu/szukites/kiado+${filters.join('+')}?page=${page}`;
+        return `https://ingatlan.com/szukites/kiado+${filters.join('+')}?page=${page}`;
     }
 
-    parse(card: any) {
+    parse(card: any): ProviderItemInterface {
+        let href = card.querySelector('.listing__link').getAttribute('href');
         return {
-            id: `https://realestatehungary.hu${card.querySelector('.listing__link').getAttribute('href')}`,
+            id: `https://realestatehungary.hu${href}`,
+            url: `https://ingatlan.com${href}`,
             price: card.querySelector('div.price').text.trim(),
             address: card.querySelector('div.listing__address').text.trim(),
         };
