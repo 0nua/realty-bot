@@ -1,5 +1,11 @@
 import {DynamoDBClient} from '@aws-sdk/client-dynamodb';
-import {DynamoDBDocumentClient, PutCommand, GetCommand} from '@aws-sdk/lib-dynamodb';
+import {
+    DynamoDBDocumentClient,
+    PutCommand,
+    GetCommand,
+    DeleteCommand,
+    UpdateCommand
+} from '@aws-sdk/lib-dynamodb';
 
 export default class DynamoDB {
 
@@ -28,6 +34,10 @@ export default class DynamoDB {
     }
 
     async get(table: string, key: object): Promise<any> {
-        return this.db.send(new GetCommand({TableName: table, Key: key}))
+        return this.db.send(new GetCommand({TableName: table, Key: key}));
+    }
+
+    async delete(table: string, key: object): Promise<any> {
+        return this.db.send(new DeleteCommand({TableName: table, Key: key}));
     }
 }
