@@ -14,7 +14,7 @@ export default class YaDisk {
             headers: {
                 Authorization: `OAuth ${process.env.YA_TOKEN}`,
             },
-            timeout: 20 * 1000
+            timeout: 10 * 1000
         };
     }
 
