@@ -13,7 +13,7 @@ export default class TgBot {
     yaDisk: YaDisk;
     buttons: object;
     queue: Queue;
-    settings: Settings
+    settings: Settings;
 
     constructor() {
         this.yaDisk = new YaDisk();

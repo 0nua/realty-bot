@@ -6,7 +6,7 @@ useDotenv: true
 provider:
     name: aws
     runtime: nodejs18.x
-    region: eu-west-3
+    region: ${env:AWS_REGION}
     versionFunctions: false
     stage: dev
     environment:
@@ -31,8 +31,12 @@ package:
         - '!readme.md'
 
 plugins:
+    - serverless-dynamodb-local
     - serverless-offline
     - serverless-express
+
+resources:
+    - ${file(config/resources.yml)}
 
 functions:
     link:
@@ -56,3 +60,10 @@ functions:
             -   http:
                     method: get
                     path: /monitor
+
+custom:
+    dynamodb:
+        stages:
+            - test
+        start:
+            migrate: true
