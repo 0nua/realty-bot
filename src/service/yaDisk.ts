@@ -5,7 +5,8 @@ export default class YaDisk {
     config: {
         headers: {
             Authorization: string
-        }
+        },
+        timeout: number
     };
 
     constructor() {
@@ -13,6 +14,7 @@ export default class YaDisk {
             headers: {
                 Authorization: `OAuth ${process.env.YA_TOKEN}`,
             },
+            timeout: 10 * 1000
         };
     }
 
