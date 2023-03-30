@@ -74,11 +74,6 @@ export default class TgBot {
 
         let collector = new Collector(chatId, settings[chatId].filters);
 
-        let added = await this.dynamoDB.put('settings', {chatId: chatId, filters: settings[chatId].filters});
-        if (!added) {
-            await Logger.log(new Error('Settings not added'));
-        }
-
         let data = await collector.getData();
         if (data.newest.length > 0) {
             let messages = [];
