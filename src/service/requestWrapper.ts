@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 interface Response {
     data: any,
     time: number
@@ -12,10 +14,10 @@ export default class RequestWrapper {
         }
     };
 
-    static async request(requestCb: any, repeat: boolean = true): Promise<Response> {
+    static async request(url: string, params: object = {}, repeat: boolean = true): Promise<Response> {
         try {
             let requestStart = (new Date()).getTime();
-            let response = await requestCb(this.params);
+            let response = await axios.get(url, {...this.params, ...params});
             let requestTime = ((new Date()).getTime() - requestStart) / 1000;
 
             return {
@@ -24,7 +26,7 @@ export default class RequestWrapper {
             }
         } catch (err: any) {
             if (repeat) {
-                return RequestWrapper.request(requestCb, false);
+                return RequestWrapper.request(url, params, false);
             }
             throw err;
         }

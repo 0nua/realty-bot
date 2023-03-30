@@ -1,5 +1,4 @@
 import RequestWrapper from "../service/requestWrapper";
-import axios from 'axios';
 import parser from 'node-html-parser';
 import crypto from 'crypto';
 import ProviderItemInterface from '../interfaces/providerItem'
@@ -10,12 +9,14 @@ export default class Base {
     selector: string;
     withPages: boolean;
     limit: number | null;
+    timeout: number;
 
     constructor() {
         this.url = '';
         this.selector = '';
         this.withPages = false;
         this.limit = null;
+        this.timeout = 10 * 1000; // in ms
     }
 
     async getData() {
@@ -26,7 +27,7 @@ export default class Base {
 
         do {
             let url = this.getUrl(page);
-            let response = await RequestWrapper.request((params: object) => axios.get(url, params));
+            let response = await RequestWrapper.request(url, {timeout: this.timeout});
 
             let dom = parser.parse(response.data);
             listings = dom.querySelectorAll(this.selector);
