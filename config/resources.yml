@@ -6,13 +6,9 @@ Resources:
             AttributeDefinitions:
                 -   AttributeName: chatId
                     AttributeType: N
-                -   AttributeName: lastUsage
-                    AttributeType: N
             KeySchema:
                 -   AttributeName: chatId
                     KeyType: HASH
-                -   AttributeName: lastUsage
-                    KeyType: RANGE
             BillingMode: PROVISIONED
             ProvisionedThroughput:
                 ReadCapacityUnits: 1
