@@ -7,6 +7,7 @@ export class RentWithPaws extends Base {
         super();
 
         this.selector = 'div.property-item';
+        this.timeout = 20 * 1000;
     }
 
     parse(card: any): ProviderItemInterface|null {
