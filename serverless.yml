@@ -39,27 +39,7 @@ resources:
     - ${file(config/resources.yml)}
 
 functions:
-    link:
-        handler: dist/handler/link.handle
-        events:
-            -   http:
-                    method: get
-                    path: /link
-    webhook:
-        handler: dist/handler/webhook.handle
-        timeout: 30
-        events:
-            -   http:
-                    method: post
-                    path: /webhook
-    monitor:
-        handler: dist/handler/monitor.handle
-        timeout: 300
-        events:
-            -   schedule: rate(5 minutes)
-            -   http:
-                    method: get
-                    path: /monitor
+    ${file(config/functions.yml)}
 
 custom:
     dynamodb:

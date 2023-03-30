@@ -1,0 +1,27 @@
+link:
+    handler: dist/handler/link.handle
+    events:
+        -   http:
+                method: get
+                path: /link
+webhook:
+    handler: dist/handler/webhook.handle
+    events:
+        -   http:
+                method: post
+                path: /webhook
+monitor:
+    handler: dist/handler/monitor.handle
+    timeout: 300
+    events:
+        -   schedule: rate(5 minutes)
+        -   http:
+                method: get
+                path: /monitor
+move:
+    handler: dist/handler/move.handle
+    timeout: 60
+    events:
+        -   http:
+                method: get
+                path: /move
