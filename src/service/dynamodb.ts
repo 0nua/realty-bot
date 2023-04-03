@@ -4,7 +4,8 @@ import {
     PutCommand,
     GetCommand,
     DeleteCommand,
-    UpdateCommand
+    UpdateCommand,
+    ScanCommand
 } from '@aws-sdk/lib-dynamodb';
 
 export default class DynamoDB {
@@ -37,7 +38,23 @@ export default class DynamoDB {
         return this.db.send(new GetCommand({TableName: table, Key: key}));
     }
 
+    async update(table: string, key: object, condition: string, placeholders: object): Promise<boolean> {
+        let params = {
+            TableName: table,
+            Key: key,
+            UpdateExpression: condition,
+            ExpressionAttributeValues: placeholders
+        };
+        let result = await this.db.send(new UpdateCommand(params));
+
+        return result['$metadata'].httpStatusCode === 200;
+    }
+
     async delete(table: string, key: object): Promise<any> {
         return this.db.send(new DeleteCommand({TableName: table, Key: key}));
+    }
+
+    async scan(table: string, fields: string): Promise<any> {
+        return this.db.send(new ScanCommand({TableName: table, ProjectionExpression: fields}));
     }
 }
