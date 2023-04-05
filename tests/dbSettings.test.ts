@@ -1,26 +1,32 @@
-import Settings from "../src/service/settings";
 import {Filters} from "../src/interfaces/settings";
+import DbSettings from "../src/service/dbSettings";
 
 function getMockWithFilters(filters: Filters) {
-    let settings = new Settings();
+    let settings = new DbSettings();
     let mock = {
         1: {
-            filters: filters,
-            lastDate: 123,
+            filters: filters
         }
     }
 
     jest.spyOn(settings, 'get')
         .mockImplementation(() => new Promise((resolve) => resolve(mock)));
 
+    jest.spyOn(settings, 'getOne')
+        .mockImplementation(() => new Promise((resolve) => resolve(mock)));
+
     return settings;
 }
 
-test('Deprecated: Test subscribtion', async () => {
-    let settings = new Settings();
+test('Test subscribtion', async () => {
+    let settings = new DbSettings();
+
     let mock = {}
 
     jest.spyOn(settings, 'get')
+        .mockImplementation(() => new Promise((resolve) => resolve(mock)));
+
+    jest.spyOn(settings, 'getOne')
         .mockImplementation(() => new Promise((resolve) => resolve(mock)));
 
     let updated = await settings.processFilter(1, 'flat', 'pets');
@@ -29,7 +35,7 @@ test('Deprecated: Test subscribtion', async () => {
     expect(updated[1].hasOwnProperty('lastDate')).toBeFalsy();
 })
 
-test('Deprecated: Test add filter', async () => {
+test('Test add filter', async () => {
     let mock = getMockWithFilters({flat: ['newly'], house: []});
     let updated = await mock.processFilter(1, 'flat', 'pets');
 
@@ -37,7 +43,7 @@ test('Deprecated: Test add filter', async () => {
     expect(updated[1].hasOwnProperty('lastDate')).toBeFalsy();
 });
 
-test('Deprecated: Test remove filter', async () => {
+test('Test remove filter', async () => {
     let mock = getMockWithFilters({flat: ['pets'], house: ['pets']});
     let updated = await mock.processFilter(1, 'flat', 'pets');
 
@@ -45,14 +51,14 @@ test('Deprecated: Test remove filter', async () => {
     expect(updated[1].hasOwnProperty('lastDate')).toBeFalsy();
 });
 
-test('Deprecated: Test unsubscription', async () => {
+test('Test unsubscription', async () => {
     let mock = getMockWithFilters({flat: ['pets'], house: []});
     let updated = await mock.processFilter(1, 'flat', 'pets');
 
     expect(updated.hasOwnProperty(1)).toBeFalsy();
 });
 
-test('Deprecated: Test add/remove one type filter', async () => {
+test('Test add/remove one type filter', async () => {
     let mock = getMockWithFilters({flat: ['price-100'], house: ['pets']});
     let updated = await mock.processFilter(1, 'flat', 'price-200');
 
