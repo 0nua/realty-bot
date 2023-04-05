@@ -41,13 +41,16 @@ export default class DbSettings implements SettingsServiceInterface {
 
     async getOne(chatId: number): Promise<SettingsInterface> {
         let result = await this.dynamoDb.get('settings', {chatId: chatId}, 'filters');
-        let item = result.Item ?? {};
 
-        return {
-            [chatId]: {
-                filters: item.filters ?? {}
-            }
-        };
+        if (result.Item) {
+            return {
+                [chatId]: {
+                    filters: result.Item.filters
+                }
+            };
+        }
+
+        return {};
     }
 
     async processFilter(chatId: number, type: string, name: string): Promise<SettingsInterface> {

@@ -8,7 +8,7 @@ export interface IQueue {
 export interface QueueServiceInterface {
     yaDisk?: YaDisk;
     dynamoDb?: DynamoDB;
-    process(subscribers: string[]): Promise<number>;
+    process(subscribers?: string[]): Promise<number>;
     getQueue(): Promise<IQueue>
     updateQueue(chatId: number, queue: IQueue): Promise<boolean>;
     getActualQueue?(subscribers: string[]): Promise<IQueue>;

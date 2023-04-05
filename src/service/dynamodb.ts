@@ -8,6 +8,8 @@ import {
     ScanCommand
 } from '@aws-sdk/lib-dynamodb';
 
+import Logger from './logger';
+
 export default class DynamoDB {
 
     db: DynamoDBDocumentClient
@@ -31,7 +33,13 @@ export default class DynamoDB {
     }
 
     async put(table: string, data: object): Promise<any> {
-        let result = await this.db.send(new PutCommand({TableName: table, Item: data}));
+        let params = {
+            TableName: table,
+            Item: data
+        };
+        let result = await this.db.send(new PutCommand(params));
+
+        this.log('put', params, result);
 
         return result['$metadata'].httpStatusCode === 200;
     }
@@ -46,7 +54,11 @@ export default class DynamoDB {
             params['ProjectionExpression'] = fields;
         }
 
-        return this.db.send(new GetCommand(params));
+        let result = await this.db.send(new GetCommand(params));
+
+        this.log('get', params, result);
+
+        return result;
     }
 
     async update(table: string, key: object, data: object): Promise<boolean> {
@@ -59,17 +71,35 @@ export default class DynamoDB {
 
         let result = await this.db.send(new UpdateCommand(params));
 
+        this.log('update', params, result);
+
         return result['$metadata'].httpStatusCode === 200;
     }
 
     async delete(table: string, key: object): Promise<boolean> {
-        let result = await this.db.send(new DeleteCommand({TableName: table, Key: key}));
+        let params = {
+            TableName: table,
+            Key: key
+        };
+
+        let result = await this.db.send(new DeleteCommand(params));
+
+        this.log('delete', params, result);
 
         return result['$metadata'].httpStatusCode === 200;
     }
 
     async scan(table: string, fields: string): Promise<any> {
-        return this.db.send(new ScanCommand({TableName: table, ProjectionExpression: fields}));
+        let params = {
+            TableName: table,
+            ProjectionExpression: fields
+        }
+
+        let result = await this.db.send(new ScanCommand(params));
+
+        this.log('scan', params, result);
+
+        return result;
     }
 
     convertDataToUpdateExpression(data: object): object {
@@ -85,5 +115,14 @@ export default class DynamoDB {
         }
 
         return result;
+    }
+
+    log(type: string, data: object, result: object) {
+        if (process.env.APP_ENV !== 'test') {
+            return;
+        }
+        console.log(
+            `DynamoDB request: ${type} with payload ${JSON.stringify(data)} and response ${JSON.stringify(result)}`
+        );
     }
 }

@@ -66,9 +66,9 @@ export default class TgBot {
     }
 
     async checkUpdates(): Promise<any> {
-        let settings: SettingsInterface = await this.settings.get();
+        let chatId = await this.queue.process();
 
-        let chatId = await this.queue.process(Object.keys(settings));
+        let settings: SettingsInterface = await this.settings.get(chatId);
 
         let collector = new Collector(chatId, settings[chatId].filters);
 
