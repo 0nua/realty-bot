@@ -1,6 +1,9 @@
 import {SettingsInterface, SettingsServiceInterface} from "../interfaces/settings";
 import YaDisk from "./yaDisk";
 
+/**
+ * @deprecated
+ */
 export default class Settings implements SettingsServiceInterface {
 
     yaDisk: YaDisk;

@@ -2,6 +2,9 @@ import DynamoDB from "./dynamodb";
 import YaDisk from "./yaDisk";
 import {IQueue, QueueServiceInterface} from '../interfaces/queue';
 
+/**
+ * @deprecated
+ */
 export default class Queue implements QueueServiceInterface {
     yaDisk: YaDisk;
 
