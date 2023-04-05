@@ -1,8 +1,8 @@
 import DynamoDB from "./dynamodb";
 import YaDisk from "./yaDisk";
-import {IQueue} from '../interfaces/queue';
+import {IQueue, QueueServiceInterface} from '../interfaces/queue';
 
-export default class Queue {
+export default class Queue implements QueueServiceInterface {
     yaDisk: YaDisk;
 
     constructor() {

@@ -31,30 +31,59 @@ export default class DynamoDB {
     }
 
     async put(table: string, data: object): Promise<any> {
-        return this.db.send(new PutCommand({TableName: table, Item: data}));
+        let result = await this.db.send(new PutCommand({TableName: table, Item: data}));
+
+        return result['$metadata'].httpStatusCode === 200;
     }
 
-    async get(table: string, key: object): Promise<any> {
-        return this.db.send(new GetCommand({TableName: table, Key: key}));
+    async get(table: string, key: object, fields: string = ''): Promise<any> {
+        let params = {
+            TableName: table,
+            Key: key
+        };
+
+        if (fields) {
+            params['ProjectionExpression'] = fields;
+        }
+
+        return this.db.send(new GetCommand(params));
     }
 
-    async update(table: string, key: object, condition: string, placeholders: object): Promise<boolean> {
+    async update(table: string, key: object, data: object): Promise<boolean> {
         let params = {
             TableName: table,
             Key: key,
-            UpdateExpression: condition,
-            ExpressionAttributeValues: placeholders
         };
+
+        params = {...params, ...this.convertDataToUpdateExpression(data)};
+
         let result = await this.db.send(new UpdateCommand(params));
 
         return result['$metadata'].httpStatusCode === 200;
     }
 
-    async delete(table: string, key: object): Promise<any> {
-        return this.db.send(new DeleteCommand({TableName: table, Key: key}));
+    async delete(table: string, key: object): Promise<boolean> {
+        let result = await this.db.send(new DeleteCommand({TableName: table, Key: key}));
+
+        return result['$metadata'].httpStatusCode === 200;
     }
 
     async scan(table: string, fields: string): Promise<any> {
         return this.db.send(new ScanCommand({TableName: table, ProjectionExpression: fields}));
+    }
+
+    convertDataToUpdateExpression(data: object): object {
+        let result = {
+            UpdateExpression: 'SET ',
+            ExpressionAttributeValues: {},
+        };
+
+        for (let prop in data) {
+            let value = data[prop];
+            result.UpdateExpression += `${prop} = :${prop}`;
+            result.ExpressionAttributeValues[`:${prop}`] = value;
+        }
+
+        return result;
     }
 }
