@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "install-app": "npm install && sls dynamodb install",
-    "start": "tsc && serverless offline start --stage=test",
+    "start": "tsc && serverless offline start --stage=offline",
     "deploy": "rm -rf ./dist && tsc && serverless deploy",
     "compile": "tsc",
     "test": "jest --silent"

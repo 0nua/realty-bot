@@ -17,7 +17,7 @@ export default class TgBot {
 
     constructor() {
         this.yaDisk = new YaDisk();
-        this.bot = new Telegraf(process.env.TG_BOT_TOKEN || 'null');
+        this.bot = new Telegraf(process.env.TG_BOT_TOKEN ?? '');
         this.queue = new Queue();
         this.settings = new Settings();
         this.buttons = {
@@ -52,7 +52,7 @@ export default class TgBot {
 
     setWebhook(req: any): Promise<boolean> {
         let event = req.apiGateway.event;
-        let link = req.query.link ?? `https://${event.requestContext.domainName}/dev/webhook`;
+        let link = req.query.link ?? `https://${event.requestContext.domainName}/${process.env.APP_ENV}/webhook`;
         return this.bot.telegram.setWebhook(link);
     }
 
@@ -175,6 +175,10 @@ export default class TgBot {
     }
 
     init(): void {
+        if (process.env.IS_OFFLINE && process.env.APP_ENV !== 'offline') {
+            throw new Error('Invalid .env file was loaded for offline mode.');
+        }
+
         this.bot.command(['start', 'configure'], ctx => {
             ctx.reply('What kind of realty do you need?', this.getConfigureKeyboard());
         });
