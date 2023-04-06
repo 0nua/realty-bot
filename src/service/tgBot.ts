@@ -57,10 +57,12 @@ export default class TgBot {
         return this.bot.telegram.setWebhook(link);
     }
 
-    async unsubscribe(settings: SettingsInterface, chatId: number): Promise<boolean> {
-        delete settings[chatId];
+    async unsubscribe(chatId: number, settings?: SettingsInterface): Promise<boolean> {
+        if (settings) {
+            delete settings[chatId];
+        }
 
-        await this.settings.update(settings, chatId);
+        await this.settings.update(settings ?? {}, chatId);
 
         return await this.deleteCollection(chatId);
     }
@@ -84,7 +86,7 @@ export default class TgBot {
             } catch (err: any) {
                 await Logger.log(err);
                 if (err.message.includes('bot was blocked by the user')) {
-                    await this.unsubscribe(settings, chatId);
+                    await this.unsubscribe(chatId, settings);
                 }
             }
         }
@@ -194,9 +196,7 @@ export default class TgBot {
         this.bot.action('close', ctx => ctx.deleteMessage());
 
         this.bot.command('stop', async ctx => {
-            let settings = await this.settings.get(ctx.chat.id);
-
-            await this.unsubscribe(settings, ctx.chat.id);
+            await this.unsubscribe(ctx.chat.id);
 
             await ctx.reply('Subscribe was rejected! Goodbye!');
         });
