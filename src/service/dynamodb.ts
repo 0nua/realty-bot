@@ -20,7 +20,7 @@ export default class DynamoDB {
             }
         };
 
-        if (process.env.APP_ENV === 'test') {
+        if (process.env.APP_ENV === 'offline') {
             config['endpoint'] = 'http://localhost:8000';
         }
 

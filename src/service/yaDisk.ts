@@ -97,7 +97,7 @@ export default class YaDisk {
     getEnvPath(path: string): string {
         let [dir, file] = path.slice(1).split('/');
 
-        let suffix = process.env.APP_ENV === 'test' ? '-test' : '';
+        let suffix = process.env.APP_ENV === 'offline' ? '-test' : '';
 
         return `/${dir}${suffix}/${file}`;
     }

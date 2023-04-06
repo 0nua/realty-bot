@@ -1,6 +1,6 @@
 import TgBot from "../src/service/tgBot";
 
-test('TgBot filters keyboard', () => {
+test('Test TgBot filters keyboard', () => {
     let keyboard = (new TgBot()).getFiltersKeyboard('flat', {
         flat: ["max-500","pets","newly","room-3", "condi", "furnished"],
         house: ["price-150", "max-250", "pets", "condi", "furnished"]
@@ -18,4 +18,14 @@ test('TgBot filters keyboard', () => {
 
     expect(keyboard.length).toBe(10);
     expect(hasBalconyBtn).toBe(true);
+});
+
+test('Test TgBot exception on wrong environment', () => {
+    process.env.IS_OFFLINE = 'true';
+
+    process.env.APP_ENV = 'dev';
+    expect(() => new TgBot()).toThrow('Invalid .env file was loaded for offline mode.');
+
+    process.env.APP_ENV = 'offline';
+    expect(()=> new TgBot()).not.toThrow('Invalid .env file was loaded for offline mode.')
 });
