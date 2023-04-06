@@ -1,7 +1,7 @@
 import YaDisk from "../src/service/yaDisk";
 
 test('Test dev environment path', () => {
-    process.env.APP_ENV = 'test';
+    process.env.APP_ENV = 'offline';
 
     let envPath = (new YaDisk()).getEnvPath('/realty-bot/test.json');
 
