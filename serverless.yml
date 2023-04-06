@@ -13,7 +13,6 @@ provider:
         TG_BOT_TOKEN: ${env:TG_BOT_TOKEN}
         YA_TOKEN: ${env:YA_TOKEN}
         ADMIN_CHAT_ID: ${env:ADMIN_CHAT_ID}
-        STAGE: ${opt:stage, self:provider.stage}
         APP_ENV: ${env:APP_ENV}
         AWS_PROJECT_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
         AWS_PROJECT_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
