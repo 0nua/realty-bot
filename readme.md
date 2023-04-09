@@ -5,7 +5,7 @@ For local configuration create `.env.offline`
 
 Create `Test bot` via Telegram BotFather and use https://webhook.site/ for link with local instance.
 
-Setting webhook via GET request with param `link`: https://xwot7bmfdj.execute-api.eu-west-3.amazonaws.com/dev/link?link=<your_url>.
+Set webhook via GET request with param `link`: http://localhost:3002/offline/link?link=<your_url>.
 
 Note: https://webhook.site/ could proxy request from webhook url to your local instance. See: XHR Redirect option.
 
