@@ -1,3 +1,16 @@
+**How to run application locally?**
+Use command `npm run start`. It runs app on your machine.
+
+For local configuration create `.env.offline`
+
+Create `Test bot` via Telegram BotFather and use https://webhook.site/ for link with local instance.
+
+Setting webhook via GET request with param `link`: https://xwot7bmfdj.execute-api.eu-west-3.amazonaws.com/dev/link?link=<your_url>.
+
+Note: https://webhook.site/ could proxy request from webhook url to your local instance. See: XHR Redirect option.
+
+Note: chain of requests `Test Bot -> Webhook site -> http://localhost:3002/offline/webhook (local instance endpoint)`
+
 **How to use dynamodb instance locally**
 
 `npm run start` will startup offline lambda app with dynamodb instance.
