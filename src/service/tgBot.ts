@@ -1,25 +1,26 @@
 import {Markup, Telegraf} from 'telegraf';
 import YaDisk from './yaDisk';
 import Collector from './collector';
-import {Filters, SettingsInterface} from "../interfaces/settings";
+import {Filters, SettingsInterface, SettingsServiceInterface} from "../interfaces/settings";
 import CollectorDataInterface from "../interfaces/collectorData";
-import Queue from "./queue";
-import Settings from "./settings";
 import Logger from "./logger";
+import DbSettings from "./dbSettings";
+import DbQueue from "./dbQueue";
+import {QueueServiceInterface} from "../interfaces/queue";
 
 export default class TgBot {
 
     bot: Telegraf;
     yaDisk: YaDisk;
     buttons: object;
-    queue: Queue;
-    settings: Settings;
+    queue: QueueServiceInterface;
+    settings: SettingsServiceInterface;
 
     constructor() {
         this.yaDisk = new YaDisk();
-        this.bot = new Telegraf(process.env.TG_BOT_TOKEN ?? '');
-        this.queue = new Queue();
-        this.settings = new Settings();
+        this.bot = new Telegraf(process.env.TG_BOT_TOKEN || '');
+        this.queue = new DbQueue();
+        this.settings = new DbSettings();
         this.buttons = {
             newly: 'Newly',
             pets: 'With pets',
@@ -56,18 +57,20 @@ export default class TgBot {
         return this.bot.telegram.setWebhook(link);
     }
 
-    async unsubscribe(settings: SettingsInterface, chatId: number): Promise<boolean> {
-        delete settings[chatId];
+    async unsubscribe(chatId: number, settings?: SettingsInterface): Promise<boolean> {
+        if (settings) {
+            delete settings[chatId];
+        }
 
-        await this.settings.update(settings);
+        await this.settings.update(settings ?? {}, chatId);
 
         return await this.deleteCollection(chatId);
     }
 
     async checkUpdates(): Promise<any> {
-        let settings: SettingsInterface = await this.settings.get();
+        let chatId = await this.queue.process();
 
-        let chatId = await this.queue.process(Object.keys(settings));
+        let settings: SettingsInterface = await this.settings.get(chatId);
 
         let collector = new Collector(chatId, settings[chatId].filters);
 
@@ -83,12 +86,12 @@ export default class TgBot {
             } catch (err: any) {
                 await Logger.log(err);
                 if (err.message.includes('bot was blocked by the user')) {
-                    await this.unsubscribe(settings, chatId);
+                    await this.unsubscribe(chatId, settings);
                 }
             }
         }
 
-        console.log({chatId: chatId, result: Object.keys(data.result).length, new: data.newest.length})
+        console.log({chatId: chatId, result: Object.keys(data.result).length, new: data.newest.length});
 
         return data;
     }
@@ -157,15 +160,18 @@ export default class TgBot {
 
             let settings = await this.settings.processFilter(ctx.chat.id, type, name);
 
-            await this.settings.update(settings);
+            await this.settings.update(settings, ctx.chat.id);
+
             await ctx.editMessageReplyMarkup(
                 {
                     inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
                 }
             );
+
             await this.deleteCollection(ctx.chat.id);
             return true;
         } catch (err) {
+            console.error(err);
             if (repeat) {
                 return await this.updateFilters(ctx, false);
             }
@@ -190,16 +196,14 @@ export default class TgBot {
         this.bot.action('close', ctx => ctx.deleteMessage());
 
         this.bot.command('stop', async ctx => {
-            let settings = await this.settings.get();
-
-            await this.unsubscribe(settings, ctx.chat.id);
+            await this.unsubscribe(ctx.chat.id);
 
             await ctx.reply('Subscribe was rejected! Goodbye!');
         });
 
         this.bot.action(/realty-(.+)/, async (ctx: any) => {
             let type = ctx.match[1];
-            let settings = await this.settings.get();
+            let settings = await this.settings.get(ctx.chat.id);
             let filters: Filters = settings[ctx.chat.id]?.filters || {};
 
             ctx.editMessageText(
@@ -213,7 +217,7 @@ export default class TgBot {
         });
 
         this.bot.command('status', async ctx => {
-            let settings = await this.settings.get();
+            let settings = await this.settings.get(ctx.chat.id);
 
             if (settings.hasOwnProperty(ctx.chat.id)) {
                 let collector = new Collector(ctx.chat.id, settings[ctx.chat.id].filters);

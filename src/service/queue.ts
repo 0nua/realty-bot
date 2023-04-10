@@ -1,10 +1,11 @@
+import DynamoDB from "./dynamodb";
 import YaDisk from "./yaDisk";
+import {IQueue, QueueServiceInterface} from '../interfaces/queue';
 
-interface IQueue {
-    [chatId: string]: number
-}
-
-export default class Queue {
+/**
+ * @deprecated
+ */
+export default class Queue implements QueueServiceInterface {
     yaDisk: YaDisk;
 
     constructor() {
@@ -16,7 +17,7 @@ export default class Queue {
 
         let chatId = await this.getChatId(queue);
 
-        await this.updateQueue(queue, chatId);
+        await this.updateQueue(chatId, queue);
 
         return chatId;
     }
@@ -25,7 +26,7 @@ export default class Queue {
         return this.yaDisk.get('/realty-bot/queue.json');
     }
 
-    updateQueue(queue: IQueue, chatId: number): Promise<boolean> {
+    updateQueue(chatId: number, queue: IQueue): Promise<boolean> {
         //Update usage
         queue[chatId] = (new Date()).getTime();
 

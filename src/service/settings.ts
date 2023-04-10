@@ -1,7 +1,10 @@
-import {SettingsInterface} from "../interfaces/settings";
+import {SettingsInterface, SettingsServiceInterface} from "../interfaces/settings";
 import YaDisk from "./yaDisk";
 
-export default class Settings {
+/**
+ * @deprecated
+ */
+export default class Settings implements SettingsServiceInterface {
 
     yaDisk: YaDisk;
 

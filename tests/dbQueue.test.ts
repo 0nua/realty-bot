@@ -1,21 +1,6 @@
-import Queue from "../src/service/queue";
+import DbQueue from "../src/service/dbQueue";
 
-test('Deprecated: Test queue logic', async () => {
-    const queue = new Queue();
-
-    jest.spyOn(queue, 'getQueue')
-        .mockImplementation(() => new Promise((resolve) => resolve({1: 1, 2: 10, 3: 100})));
-
-    let subscribers = ['2', '4'];
-    let actual = await queue.getActualQueue(subscribers);
-    let chatId = queue.getChatId(actual);
-
-    expect(Object.keys(actual)).toEqual(subscribers);
-
-    expect(chatId).toBe(2);
-});
-
-test('Deprecated: Test getting oldest chat id', async () => {
+test('Test getting oldest chat id from dynamo queue', async () => {
     let mock = {
         "113301052": 1677185644326,
         "206525893": 1677187444466,
@@ -31,13 +16,13 @@ test('Deprecated: Test getting oldest chat id', async () => {
         "679841426": 1677186244655
     };
 
-    const queue = new Queue();
+    const queue = new DbQueue();
 
     jest.spyOn(queue, 'getQueue')
         .mockImplementation(() => new Promise((resolve) => resolve(mock)));
 
-    let actual = await queue.getActualQueue(Object.keys(mock));
+    let actual = await queue.getQueue();
     let chatId = queue.getChatId(actual);
 
     expect(chatId).toBe(623339899);
-});
+})
