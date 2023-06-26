@@ -1,5 +1,9 @@
 **How to run application locally?**
-Use command `npm run start`. It runs app on your machine.
+
+- Installing app: `npm run install-app`
+- Starting app: `npm run start`
+- Testing app: `npm run test`
+- Deploying app: `npm run deploy`
 
 For local configuration create `.env.offline`
 
