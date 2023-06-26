@@ -85,7 +85,10 @@ export default class TgBot {
                 await Promise.all(messages);
             } catch (err: any) {
                 await Logger.log(err);
-                if (err.message.includes('bot was blocked by the user')) {
+                if (
+                    err.message.includes('bot was blocked by the user') ||
+                    err.message.includes('user is deactivated')
+                ) {
                     await this.unsubscribe(chatId, settings);
                 }
             }
