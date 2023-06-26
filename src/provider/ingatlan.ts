@@ -9,7 +9,7 @@ export class Ingatlan extends Base {
         super();
 
         this.filters = filters;
-        this.selector = 'div.listing';
+        this.selector = '.listing-card';
         this.withPages = true;
         this.limit = 20
     }
@@ -60,12 +60,18 @@ export class Ingatlan extends Base {
     }
 
     parse(card: any): ProviderItemInterface {
-        let href = card.querySelector('.listing__link').getAttribute('href');
+        let href = card.getAttribute('href');
+        let items = card.querySelector('.listing-card-content').text
+            .trim()
+            .split('\n')
+            .map((item: string) => item.trim());
+
+        let [price, address] = items.filter((item: string) => item !== '');
         return {
             id: `https://realestatehungary.hu${href}`,
             url: `https://ingatlan.com${href}`,
-            price: card.querySelector('div.price').text.trim(),
-            address: card.querySelector('div.listing__address').text.trim(),
+            price: price ?? '',
+            address: address ?? '',
         };
     }
 }
