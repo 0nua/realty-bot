@@ -7,6 +7,7 @@ import Logger from "./logger";
 import DbSettings from "./dbSettings";
 import DbQueue from "./dbQueue";
 import {QueueServiceInterface} from "../interfaces/queue";
+import Location from "../enums/location";
 
 export default class TgBot {
 
@@ -189,7 +190,36 @@ export default class TgBot {
         }
 
         this.bot.command(['start', 'configure'], ctx => {
-            ctx.reply('What kind of realty do you need?', this.getConfigureKeyboard());
+            ctx.reply(
+                'What is your location?',
+                Markup.inlineKeyboard(
+                    [
+                        [
+                            Markup.button.callback('Budapest', `location-${Location.BUDAPEST}`),
+                            Markup.button.callback('Belgrade', `location-${Location.BELGRAD}`),
+                        ],
+                        [
+                            Markup.button.callback('Close', 'close')
+                        ]
+                    ]
+                )
+            );
+        });
+
+        this.bot.action(/(location)-(.+)/, async (ctx: any) => {
+            let type = ctx.match[1];
+            let name = ctx.match[2];
+
+            let settings = await this.settings.processFilter(ctx.chat.id, type, name);
+
+            await this.settings.update(settings, ctx.chat.id);
+
+            await this.deleteCollection(ctx.chat.id);
+
+            await ctx.editMessageText(
+                `What kind of realty do you need in ${name[0].toUpperCase() + name.slice(1)}?`,
+                this.getConfigureKeyboard()
+            );
         });
 
         this.bot.action('back', ctx => {

@@ -1,5 +1,6 @@
 import DynamoDB from "./dynamodb";
 import {SettingsServiceInterface, SettingsInterface} from "../interfaces/settings";
+import Location from "../enums/location";
 
 export default class DbSettings implements SettingsServiceInterface {
 
@@ -57,7 +58,18 @@ export default class DbSettings implements SettingsServiceInterface {
         let settings = await this.getOne(chatId);
 
         if (settings.hasOwnProperty(chatId) === false) {
-            settings[chatId] = {filters: {house: [], flat: []}};
+            settings[chatId] = {filters: {house: [], flat: [], location: Location.BUDAPEST}};
+        }
+
+        if (type === 'location') {
+            if ((settings[chatId].filters.location ?? Location.BUDAPEST) !== name) {
+                settings[chatId].filters = {
+                    location: name,
+                    flat: [],
+                    house: []
+                };
+            }
+            return settings;
         }
 
         let filters = settings[chatId].filters[type] || [];
