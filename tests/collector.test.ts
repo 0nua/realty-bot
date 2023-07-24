@@ -23,6 +23,18 @@ test('Links with filters', () => {
     );
 });
 
+test('Links with new location', () => {
+    let filters: Filters = {
+        flat: ["max-500", "pets", "newly", "room-3", "condi", "furnished"],
+        house: ["price-150", "max-250", "pets", "condi", "furnished"],
+        location: 'beograd'
+    };
+
+    let urls = new Collector(367825282, filters).getUrls();
+
+    expect(urls.length).toBe(0);
+});
+
 test('Test collector data fetching', async () => {
     let filters: Filters = {
         flat: ["max-500", "pets", "newly", "room-3", "condi", "furnished"],

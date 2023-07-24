@@ -2,6 +2,7 @@ import YaDisk from "../service/yaDisk";
 import DynamoDB from "../service/dynamodb";
 
 export interface Filters {
+    location?: string,
     flat: string[],
     house: string[],
 }

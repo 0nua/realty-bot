@@ -8,6 +8,7 @@ import ProviderItemInterface from '../interfaces/providerItem';
 import CollectorDataInterface from '../interfaces/collectorData';
 import {Filters} from "../interfaces/settings";
 import Logger from './logger';
+import Location from "../enums/location";
 
 export default class Collector {
 
@@ -18,7 +19,18 @@ export default class Collector {
     constructor(chatId: number, filters: Filters) {
         this.chatId = chatId;
         this.yaDisk = new YaDisk();
-        this.providers = [new RentWithPaws()];
+        this.providers = [];
+
+        let location = filters.location ?? Location.BUDAPEST;
+
+        if (RentWithPaws.isApplicable(location)) {
+            this.providers.push(new RentWithPaws());
+        }
+
+        let providers = [
+            Ingatlan,
+            Alberlet
+        ];
 
         for (let type in filters) {
             let values = [...filters[type]];
@@ -28,8 +40,12 @@ export default class Collector {
             values.push(type);
             values.push('location');
 
-            this.providers.push(new Ingatlan(values));
-            this.providers.push(new Alberlet(values));
+            providers.forEach((Provider) => {
+               if (Provider.isApplicable(location) === false) {
+                   return;
+               }
+                this.providers.push(new Provider(values));
+            });
         }
     }
 
