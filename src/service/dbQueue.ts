@@ -1,5 +1,4 @@
 import DynamoDB from "./dynamodb";
-import Queue from "./queue";
 import {IQueue, QueueServiceInterface} from '../interfaces/queue';
 
 export default class DbQueue implements QueueServiceInterface {
