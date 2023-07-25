@@ -9,8 +9,7 @@ export interface Filters {
 
 export interface SettingsInterface {
     [id: number]: {
-        filters: Filters,
-        lastDate?: number
+        filters: Filters
     }
 }
 
