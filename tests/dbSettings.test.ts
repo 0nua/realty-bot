@@ -1,4 +1,4 @@
-import {Filters} from "../src/interfaces/settings";
+import Filters from "../src/dto/filters";
 import DbSettings from "../src/service/dbSettings";
 
 function getMockWithFilters(filters: Filters) {
@@ -35,28 +35,28 @@ test('Test subscribtion', async () => {
 })
 
 test('Test add filter', async () => {
-    let mock = getMockWithFilters({flat: ['newly'], house: []});
+    let mock = getMockWithFilters(new Filters({flat: ['newly'], house: []}));
     let updated = await mock.processFilter(1, 'flat', 'pets');
 
     expect(updated[1].filters.flat).toEqual(['newly', 'pets']);
 });
 
 test('Test remove filter', async () => {
-    let mock = getMockWithFilters({flat: ['pets'], house: ['pets']});
+    let mock = getMockWithFilters(new Filters({flat: ['pets'], house: ['pets']}));
     let updated = await mock.processFilter(1, 'flat', 'pets');
 
     expect(updated[1].filters.flat).toEqual([]);
 });
 
 test('Test unsubscription', async () => {
-    let mock = getMockWithFilters({flat: ['pets'], house: []});
+    let mock = getMockWithFilters(new Filters({flat: ['pets'], house: []}));
     let updated = await mock.processFilter(1, 'flat', 'pets');
 
     expect(updated.hasOwnProperty(1)).toBeFalsy();
 });
 
 test('Test add/remove one type filter', async () => {
-    let mock = getMockWithFilters({flat: ['price-100'], house: ['pets']});
+    let mock = getMockWithFilters(new Filters({flat: ['price-100'], house: ['pets']}));
     let updated = await mock.processFilter(1, 'flat', 'price-200');
 
     expect(updated[1].filters.flat.includes('price-100')).toBeFalsy();

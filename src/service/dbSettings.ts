@@ -1,5 +1,6 @@
 import DynamoDB from "./dynamodb";
 import {SettingsServiceInterface, SettingsInterface} from "../interfaces/settings";
+import Filters from '../dto/filters';
 import Location from "../enums/location";
 
 export default class DbSettings implements SettingsServiceInterface {
@@ -20,7 +21,7 @@ export default class DbSettings implements SettingsServiceInterface {
         let converted = {};
         for (let index in settings.Items) {
             let item = settings.Items[index];
-            converted[item.chatId] = {filters: item.filters};
+            converted[item.chatId] = {filters: new Filters(item.filters)};
         }
 
         return converted;
@@ -34,7 +35,7 @@ export default class DbSettings implements SettingsServiceInterface {
 
         return this.dynamoDb.put('settings', {
                 chatId: chatId,
-                filters: data.filters,
+                filters: Object.assign({}, data.filters),
                 lastUsage: (new Date()).getTime()
             }
         );
@@ -46,7 +47,7 @@ export default class DbSettings implements SettingsServiceInterface {
         if (result.Item) {
             return {
                 [chatId]: {
-                    filters: result.Item.filters
+                    filters: new Filters(result.Item.filters)
                 }
             };
         }
@@ -58,16 +59,12 @@ export default class DbSettings implements SettingsServiceInterface {
         let settings = await this.getOne(chatId);
 
         if (settings.hasOwnProperty(chatId) === false) {
-            settings[chatId] = {filters: {house: [], flat: [], location: Location.BUDAPEST}};
+            settings[chatId] = {filters: new Filters()};
         }
 
         if (type === 'location') {
-            if ((settings[chatId].filters.location ?? Location.BUDAPEST) !== name) {
-                settings[chatId].filters = {
-                    location: name,
-                    flat: [],
-                    house: []
-                };
+            if (settings[chatId].filters.location !== name) {
+                settings[chatId].filters = new Filters({location: name, flat: [], house: []});
             }
             return settings;
         }

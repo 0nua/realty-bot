@@ -6,7 +6,7 @@ import {RentWithPaws} from '../provider/rentWithPaws';
 import {Alberlet} from '../provider/alberlet';
 import ProviderItemInterface from '../interfaces/providerItem';
 import CollectorDataInterface from '../interfaces/collectorData';
-import {Filters} from "../interfaces/settings";
+import Filters from '../dto/filters';
 import Logger from './logger';
 import Location from "../enums/location";
 
@@ -21,9 +21,7 @@ export default class Collector {
         this.yaDisk = new YaDisk();
         this.providers = [];
 
-        let location = filters.location ?? Location.BUDAPEST;
-
-        if (RentWithPaws.isApplicable(location)) {
+        if (RentWithPaws.isApplicable(filters.location)) {
             this.providers.push(new RentWithPaws());
         }
 
@@ -32,7 +30,7 @@ export default class Collector {
             Alberlet
         ];
 
-        for (let type in filters) {
+        for (let type in {flat: filters.flat, house: filters.house}) {
             let values = [...filters[type]];
             if (values.length === 0) {
                 continue;
@@ -41,7 +39,7 @@ export default class Collector {
             values.push('location');
 
             providers.forEach((Provider) => {
-               if (Provider.isApplicable(location) === false) {
+               if (Provider.isApplicable(filters.location) === false) {
                    return;
                }
                 this.providers.push(new Provider(values));

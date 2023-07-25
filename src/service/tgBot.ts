@@ -1,7 +1,8 @@
 import {Markup, Telegraf} from 'telegraf';
 import YaDisk from './yaDisk';
 import Collector from './collector';
-import {Filters, SettingsInterface, SettingsServiceInterface} from "../interfaces/settings";
+import {SettingsInterface, SettingsServiceInterface} from "../interfaces/settings";
+import Filters from '../dto/filters';
 import CollectorDataInterface from "../interfaces/collectorData";
 import Logger from "./logger";
 import DbSettings from "./dbSettings";
@@ -73,7 +74,7 @@ export default class TgBot {
 
         let settings: SettingsInterface = await this.settings.get(chatId);
 
-        let collector = new Collector(chatId, settings[chatId].filters);
+        let collector = new Collector(chatId, <Filters>settings[chatId].filters);
 
         let data = await collector.getData();
         if (data.newest.length > 0) {
@@ -168,7 +169,7 @@ export default class TgBot {
 
             await ctx.editMessageReplyMarkup(
                 {
-                    inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
+                    inline_keyboard: this.getFiltersKeyboard(type, new Filters(settings[ctx.chat.id]?.filters || {}))
                 }
             );
 
@@ -237,7 +238,7 @@ export default class TgBot {
         this.bot.action(/realty-(.+)/, async (ctx: any) => {
             let type = ctx.match[1];
             let settings = await this.settings.get(ctx.chat.id);
-            let filters: Filters = settings[ctx.chat.id]?.filters || {};
+            let filters = new Filters(settings[ctx.chat.id]?.filters || {});
 
             ctx.editMessageText(
                 `Okay, you need a ${type}, may be some details?!`,
@@ -253,7 +254,7 @@ export default class TgBot {
             let settings = await this.settings.get(ctx.chat.id);
 
             if (settings.hasOwnProperty(ctx.chat.id)) {
-                let collector = new Collector(ctx.chat.id, settings[ctx.chat.id].filters);
+                let collector = new Collector(ctx.chat.id, <Filters>settings[ctx.chat.id].filters);
 
                 let links = [];
                 for (let link in collector.getUrls()) {
