@@ -18,10 +18,3 @@ monitor:
         -   http:
                 method: get
                 path: /monitor
-move:
-    handler: dist/handler/move.handle
-    timeout: 60
-    events:
-        -   http:
-                method: get
-                path: /move
