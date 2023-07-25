@@ -1,6 +1,5 @@
 enum Location {
-    BUDAPEST = 'budapest',
-    BELGRAD = 'beograd'
+    BUDAPEST = 'budapest'
 }
 
 export default Location;

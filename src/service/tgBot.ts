@@ -190,15 +190,21 @@ export default class TgBot {
             throw new Error('Invalid .env file was loaded for offline mode.');
         }
 
-        this.bot.command(['start', 'configure'], ctx => {
-            ctx.reply(
+        this.bot.command(['start', 'configure'], async ctx => {
+            let settings = await this.settings.get(ctx.chat.id);
+            let filters = new Filters(settings[ctx.chat.id]?.filters || {});
+
+            await ctx.reply(
                 'What is your location?',
                 Markup.inlineKeyboard(
                     [
-                        [
-                            Markup.button.callback('Budapest', `location-${Location.BUDAPEST}`),
-                            Markup.button.callback('Belgrade', `location-${Location.BELGRAD}`),
-                        ],
+                        Object.keys(Location).map((key) => {
+                            let name = Location[key][0].toUpperCase() + Location[key].slice(1);
+                            return Markup.button.callback(
+                                `${name} ${filters.location === Location[key] ? '+' : ''}`,
+                                `location-${Location[key]}`
+                            );
+                        }),
                         [
                             Markup.button.callback('Close', 'close')
                         ]
