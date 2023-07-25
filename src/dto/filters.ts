@@ -1,4 +1,4 @@
-import {Filters as FiltersInterface} from '../interfaces/settings';
+import {FiltersInterface as FiltersInterface} from '../interfaces/settings';
 import Location from "../enums/location";
 
 export default class Filters implements FiltersInterface {

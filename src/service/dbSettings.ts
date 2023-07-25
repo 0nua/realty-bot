@@ -27,6 +27,12 @@ export default class DbSettings implements SettingsServiceInterface {
         return converted;
     }
 
+    async getFilters(chatId: number): Promise<Filters> {
+        let settings = await this.getOne(chatId);
+
+        return new Filters(settings[chatId]?.filters ?? {});
+    }
+
     async update(settings: SettingsInterface, chatId: number = 0): Promise<boolean> {
         let data = settings[chatId] ?? null;
         if (data === null) {

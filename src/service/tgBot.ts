@@ -9,6 +9,7 @@ import DbSettings from "./dbSettings";
 import DbQueue from "./dbQueue";
 import {QueueServiceInterface} from "../interfaces/queue";
 import Location from "../enums/location";
+import StringHelper from "../helpers/stringHelper";
 
 export default class TgBot {
 
@@ -196,8 +197,7 @@ export default class TgBot {
                 Markup.inlineKeyboard(
                     [
                         Object.keys(Location).map((key) => {
-                            let name = Location[key][0].toUpperCase() + Location[key].slice(1);
-                            return Markup.button.callback(name, `location-${Location[key]}`);
+                            return Markup.button.callback(StringHelper.ucFirst(Location[key]), `location-${Location[key]}`);
                         }),
                         [
                             Markup.button.callback('Close', 'close')
@@ -218,13 +218,17 @@ export default class TgBot {
             await this.deleteCollection(ctx.chat.id);
 
             await ctx.editMessageText(
-                `What kind of realty do you need in ${name[0].toUpperCase() + name.slice(1)}?`,
+                `What kind of realty do you need in ${StringHelper.ucFirst(name)}?`,
                 this.getConfigureKeyboard()
             );
         });
 
-        this.bot.action('back', ctx => {
-            ctx.editMessageText('What kind of realty do you need?', this.getConfigureKeyboard());
+        this.bot.action('back', async (ctx: any) => {
+            let filters = await this.settings.getFilters(ctx.chat.id);
+            await ctx.editMessageText(
+                `What kind of realty do you need ${StringHelper.ucFirst(filters.location)}?`,
+                this.getConfigureKeyboard()
+            );
         });
 
         this.bot.action('close', ctx => ctx.deleteMessage());
@@ -237,8 +241,7 @@ export default class TgBot {
 
         this.bot.action(/realty-(.+)/, async (ctx: any) => {
             let type = ctx.match[1];
-            let settings = await this.settings.get(ctx.chat.id);
-            let filters = new Filters(settings[ctx.chat.id]?.filters || {});
+            let filters = await this.settings.getFilters(ctx.chat.id);
 
             ctx.editMessageText(
                 `Okay, you need a ${type}, may be some details?!`,
