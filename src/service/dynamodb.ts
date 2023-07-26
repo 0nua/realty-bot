@@ -118,10 +118,7 @@ export default class DynamoDB {
     }
 
     log(type: string, data: object, result: object) {
-        if (process.env.APP_ENV !== 'offline') {
-            return;
-        }
-        console.log(
+        Logger.debug(
             `DynamoDB request: ${type} with payload ${JSON.stringify(data)} and response ${JSON.stringify(result)}`
         );
     }

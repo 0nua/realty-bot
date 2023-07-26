@@ -5,6 +5,7 @@ link:
                 method: get
                 path: /link
 webhook:
+    timeout: 10
     handler: dist/handler/webhook.handle
     events:
         -   http:
