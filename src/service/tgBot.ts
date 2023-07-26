@@ -72,10 +72,8 @@ export default class TgBot {
 
     async checkUpdates(): Promise<any> {
         let chatId = await this.queue.process();
-
-        let settings: SettingsInterface = await this.settings.get(chatId);
-
-        let collector = new Collector(chatId, <Filters>settings[chatId].filters);
+        let filters = await this.settings.getFilters(chatId);
+        let collector = new Collector(chatId, filters);
 
         let data = await collector.getData();
         if (data.newest.length > 0) {
@@ -92,7 +90,7 @@ export default class TgBot {
                     err.message.includes('bot was blocked by the user') ||
                     err.message.includes('user is deactivated')
                 ) {
-                    await this.unsubscribe(chatId, settings);
+                    await this.unsubscribe(chatId);
                 }
             }
         }
