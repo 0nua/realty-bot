@@ -13,4 +13,8 @@ export default class Filters implements FiltersInterface {
             this.location = filters.location ?? Location.BUDAPEST;
         }
     }
+
+    public isEmpty(): boolean {
+        return this.flat.length === 0 && this.house.length === 0;
+    }
 }

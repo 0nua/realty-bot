@@ -61,42 +61,45 @@ export default class DbSettings implements SettingsServiceInterface {
         return {};
     }
 
-    async processFilter(chatId: number, type: string, name: string): Promise<SettingsInterface> {
-        let settings = await this.getOne(chatId);
-
-        if (settings.hasOwnProperty(chatId) === false) {
-            settings[chatId] = {filters: new Filters()};
-        }
-
+    async applyFilter(chatId: number, type: string, name: string): Promise<Filters> {
+        let filters = await this.getFilters(chatId);
         if (type === 'location') {
-            if (settings[chatId].filters.location !== name) {
-                settings[chatId].filters = new Filters({location: name, flat: [], house: []});
+            if (filters.location !== name) {
+                filters.location = name;
+                filters.house = [];
+                filters.flat = [];
             }
-            return settings;
+
+            return filters;
         }
 
-        let filters = settings[chatId].filters[type] || [];
-
+        let options = filters[type] || [];
         if (name.includes('-')) {
             let [alias, value] = name.split('-');
-            filters = filters.filter((item: string) => !item.includes(alias) || item === name);
+            options = options.filter((item: string) => !item.includes(alias) || item === name);
         }
 
-        if (filters.indexOf(name) === -1) {
-            filters.push(name);
+        if (options.indexOf(name) === -1) {
+            options.push(name);
         } else {
-            filters = filters.filter((item: string) => item !== name);
+            options = options.filter((item: string) => item !== name);
         }
 
-        settings[chatId].filters[type] = filters;
+        filters[type] = options;
 
-        let houseFilters = settings[chatId].filters.house;
-        let flatFilters = settings[chatId].filters.flat;
+        return filters;
+    }
 
-        if (houseFilters.length === 0 && flatFilters.length === 0) {
+    async processFilter(chatId: number, type: string, name: string): Promise<SettingsInterface> {
+        let filters = await this.applyFilter(chatId, type, name);
+        if (filters.isEmpty()) {
             return {};
         }
 
-        return settings;
+        return {
+            [chatId]: {
+                filters: filters
+            }
+        };
     }
 }

@@ -3,9 +3,9 @@ import DynamoDB from "../service/dynamodb";
 import Filters from '../dto/filters';
 
 export interface FiltersInterface {
-    location?: string,
-    flat: string[],
-    house: string[],
+    location?: string;
+    flat: string[];
+    house: string[];
 }
 
 export interface SettingsInterface {
@@ -20,5 +20,6 @@ export interface SettingsServiceInterface {
     get(chatId?: number): Promise<SettingsInterface>;
     getFilters(chatId: number): Promise<Filters>
     update(settings: SettingsInterface, chatId: number): Promise<boolean>;
+    applyFilter(chatId: number, type: string, name: string): Promise<Filters>;
     processFilter(chatId: number, type: string, name: string): Promise<SettingsInterface>;
 }

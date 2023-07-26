@@ -62,3 +62,24 @@ test('Test add/remove one type filter', async () => {
     expect(updated[1].filters.flat.includes('price-100')).toBeFalsy();
     expect(updated[1].filters.flat.includes('price-200')).toBeTruthy();
 });
+
+test('Test apply filter', async () => {
+    let mock = getMockWithFilters(new Filters({flat: ['newly'], house: []}));
+    let filters = await mock.applyFilter(1, 'flat', 'price-100');
+
+    expect(filters.flat).toEqual(['newly', 'price-100']);
+});
+
+test('Test apply the same filter', async () => {
+    let mock = getMockWithFilters(new Filters({flat: ['pets'], house: []}));
+    let filters = await mock.applyFilter(1, 'flat', 'pets');
+
+    expect(filters.flat).toEqual([]);
+});
+
+test('Test apply one type filter', async () => {
+    let mock = getMockWithFilters(new Filters({flat: ['price-100'], house: []}));
+    let filters = await mock.applyFilter(1, 'flat', 'price-200');
+
+    expect(filters.flat).toEqual(['price-200']);
+});
