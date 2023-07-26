@@ -1,12 +1,15 @@
 import {Markup, Telegraf} from 'telegraf';
 import YaDisk from './yaDisk';
 import Collector from './collector';
-import {Filters, SettingsInterface, SettingsServiceInterface} from "../interfaces/settings";
+import {SettingsInterface, SettingsServiceInterface} from "../interfaces/settings";
+import Filters from '../dto/filters';
 import CollectorDataInterface from "../interfaces/collectorData";
 import Logger from "./logger";
 import DbSettings from "./dbSettings";
 import DbQueue from "./dbQueue";
 import {QueueServiceInterface} from "../interfaces/queue";
+import Location from "../enums/location";
+import StringHelper from "../helpers/stringHelper";
 
 export default class TgBot {
 
@@ -69,10 +72,8 @@ export default class TgBot {
 
     async checkUpdates(): Promise<any> {
         let chatId = await this.queue.process();
-
-        let settings: SettingsInterface = await this.settings.get(chatId);
-
-        let collector = new Collector(chatId, settings[chatId].filters);
+        let filters = await this.settings.getFilters(chatId);
+        let collector = new Collector(chatId, filters);
 
         let data = await collector.getData();
         if (data.newest.length > 0) {
@@ -89,7 +90,7 @@ export default class TgBot {
                     err.message.includes('bot was blocked by the user') ||
                     err.message.includes('user is deactivated')
                 ) {
-                    await this.unsubscribe(chatId, settings);
+                    await this.unsubscribe(chatId);
                 }
             }
         }
@@ -167,7 +168,7 @@ export default class TgBot {
 
             await ctx.editMessageReplyMarkup(
                 {
-                    inline_keyboard: this.getFiltersKeyboard(type, settings[ctx.chat.id]?.filters || {})
+                    inline_keyboard: this.getFiltersKeyboard(type, new Filters(settings[ctx.chat.id]?.filters || {}))
                 }
             );
 
@@ -189,11 +190,45 @@ export default class TgBot {
         }
 
         this.bot.command(['start', 'configure'], ctx => {
-            ctx.reply('What kind of realty do you need?', this.getConfigureKeyboard());
+            ctx.reply(
+                'What is your location?',
+                Markup.inlineKeyboard(
+                    [
+                        Object.keys(Location).map((key) => {
+                            return Markup.button.callback(StringHelper.ucFirst(Location[key]), `location-${Location[key]}`);
+                        }),
+                        [
+                            Markup.button.callback('Close', 'close')
+                        ]
+                    ]
+                )
+            );
         });
 
-        this.bot.action('back', ctx => {
-            ctx.editMessageText('What kind of realty do you need?', this.getConfigureKeyboard());
+        this.bot.action(/(location)-(.+)/, async (ctx: any) => {
+            let type = ctx.match[1];
+            let name = ctx.match[2];
+
+            let settings = await this.settings.processFilter(ctx.chat.id, type, name);
+            //TODO: not update without changes
+            await this.settings.update(settings, ctx.chat.id);
+
+            if (settings.hasOwnProperty(ctx.chat.id) === false) {
+                await this.deleteCollection(ctx.chat.id);
+            }
+
+            await ctx.editMessageText(
+                `What kind of realty do you need in ${StringHelper.ucFirst(name)}?`,
+                this.getConfigureKeyboard()
+            );
+        });
+
+        this.bot.action('back', async (ctx: any) => {
+            let filters = await this.settings.getFilters(ctx.chat.id);
+            await ctx.editMessageText(
+                `What kind of realty do you need ${StringHelper.ucFirst(filters.location)}?`,
+                this.getConfigureKeyboard()
+            );
         });
 
         this.bot.action('close', ctx => ctx.deleteMessage());
@@ -206,8 +241,7 @@ export default class TgBot {
 
         this.bot.action(/realty-(.+)/, async (ctx: any) => {
             let type = ctx.match[1];
-            let settings = await this.settings.get(ctx.chat.id);
-            let filters: Filters = settings[ctx.chat.id]?.filters || {};
+            let filters = await this.settings.getFilters(ctx.chat.id);
 
             ctx.editMessageText(
                 `Okay, you need a ${type}, may be some details?!`,
@@ -223,7 +257,7 @@ export default class TgBot {
             let settings = await this.settings.get(ctx.chat.id);
 
             if (settings.hasOwnProperty(ctx.chat.id)) {
-                let collector = new Collector(ctx.chat.id, settings[ctx.chat.id].filters);
+                let collector = new Collector(ctx.chat.id, <Filters>settings[ctx.chat.id].filters);
 
                 let links = [];
                 for (let link in collector.getUrls()) {

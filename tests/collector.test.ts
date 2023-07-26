@@ -1,14 +1,14 @@
 import Collector from '../src/service/collector';
-import {Filters} from "../src/interfaces/settings";
+import Filters from "../src/dto/filters";
 import {RentWithPaws} from "../src/provider/rentWithPaws";
 import {Ingatlan} from "../src/provider/ingatlan";
 import crypto from "crypto";
 
 test('Links with filters', () => {
-    let filters: Filters = {
+    let filters = new Filters({
         flat: ["max-500", "pets", "newly", "room-3", "condi", "furnished"],
         house: ["price-150", "max-250", "pets", "condi", "furnished"]
-    };
+    });
 
     let urls = new Collector(367825282, filters).getUrls();
 
@@ -23,11 +23,23 @@ test('Links with filters', () => {
     );
 });
 
+test('Links with new location', () => {
+    let filters = new Filters({
+        flat: ["max-500", "pets", "newly", "room-3", "condi", "furnished"],
+        house: ["price-150", "max-250", "pets", "condi", "furnished"],
+        location: 'beograd'
+    });
+
+    let urls = new Collector(367825282, filters).getUrls();
+
+    expect(urls.length).toBe(0);
+});
+
 test('Test collector data fetching', async () => {
-    let filters: Filters = {
+    let filters = new Filters({
         flat: ["max-500", "pets", "newly", "room-3", "condi", "furnished"],
         house: [],
-    };
+    });
 
     let rentWithPawsProvider = new RentWithPaws();
     jest.spyOn(rentWithPawsProvider, 'getData')

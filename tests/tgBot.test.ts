@@ -1,10 +1,11 @@
 import TgBot from "../src/service/tgBot";
+import Filters from '../src/dto/filters';
 
 test('Test TgBot filters keyboard', () => {
-    let keyboard = (new TgBot()).getFiltersKeyboard('flat', {
+    let keyboard = (new TgBot()).getFiltersKeyboard('flat', new Filters({
         flat: ["max-500","pets","newly","room-3", "condi", "furnished"],
         house: ["price-150", "max-250", "pets", "condi", "furnished"]
-    });
+    }));
 
     let hasBalconyBtn = false;
     for (let row in keyboard) {

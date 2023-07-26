@@ -1,5 +1,7 @@
 import DynamoDB from "./dynamodb";
 import {SettingsServiceInterface, SettingsInterface} from "../interfaces/settings";
+import Filters from '../dto/filters';
+import Location from "../enums/location";
 
 export default class DbSettings implements SettingsServiceInterface {
 
@@ -19,10 +21,16 @@ export default class DbSettings implements SettingsServiceInterface {
         let converted = {};
         for (let index in settings.Items) {
             let item = settings.Items[index];
-            converted[item.chatId] = {filters: item.filters};
+            converted[item.chatId] = {filters: new Filters(item.filters)};
         }
 
         return converted;
+    }
+
+    async getFilters(chatId: number): Promise<Filters> {
+        let settings = await this.getOne(chatId);
+
+        return new Filters(settings[chatId]?.filters ?? {});
     }
 
     async update(settings: SettingsInterface, chatId: number = 0): Promise<boolean> {
@@ -33,7 +41,7 @@ export default class DbSettings implements SettingsServiceInterface {
 
         return this.dynamoDb.put('settings', {
                 chatId: chatId,
-                filters: data.filters,
+                filters: Object.assign({}, data.filters),
                 lastUsage: (new Date()).getTime()
             }
         );
@@ -45,7 +53,7 @@ export default class DbSettings implements SettingsServiceInterface {
         if (result.Item) {
             return {
                 [chatId]: {
-                    filters: result.Item.filters
+                    filters: new Filters(result.Item.filters)
                 }
             };
         }
@@ -53,35 +61,45 @@ export default class DbSettings implements SettingsServiceInterface {
         return {};
     }
 
-    async processFilter(chatId: number, type: string, name: string): Promise<SettingsInterface> {
-        let settings = await this.getOne(chatId);
+    async applyFilter(chatId: number, type: string, name: string): Promise<Filters> {
+        let filters = await this.getFilters(chatId);
+        if (type === 'location') {
+            if (filters.location !== name) {
+                filters.location = name;
+                filters.house = [];
+                filters.flat = [];
+            }
 
-        if (settings.hasOwnProperty(chatId) === false) {
-            settings[chatId] = {filters: {house: [], flat: []}};
+            return filters;
         }
 
-        let filters = settings[chatId].filters[type] || [];
-
+        let options = filters[type] || [];
         if (name.includes('-')) {
             let [alias, value] = name.split('-');
-            filters = filters.filter((item: string) => !item.includes(alias) || item === name);
+            options = options.filter((item: string) => !item.includes(alias) || item === name);
         }
 
-        if (filters.indexOf(name) === -1) {
-            filters.push(name);
+        if (options.indexOf(name) === -1) {
+            options.push(name);
         } else {
-            filters = filters.filter((item: string) => item !== name);
+            options = options.filter((item: string) => item !== name);
         }
 
-        settings[chatId].filters[type] = filters;
+        filters[type] = options;
 
-        let houseFilters = settings[chatId].filters.house;
-        let flatFilters = settings[chatId].filters.flat;
+        return filters;
+    }
 
-        if (houseFilters.length === 0 && flatFilters.length === 0) {
+    async processFilter(chatId: number, type: string, name: string): Promise<SettingsInterface> {
+        let filters = await this.applyFilter(chatId, type, name);
+        if (filters.isEmpty()) {
             return {};
         }
 
-        return settings;
+        return {
+            [chatId]: {
+                filters: filters
+            }
+        };
     }
 }

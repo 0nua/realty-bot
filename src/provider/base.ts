@@ -2,6 +2,7 @@ import RequestWrapper from "../service/requestWrapper";
 import parser from 'node-html-parser';
 import crypto from 'crypto';
 import ProviderItemInterface from '../interfaces/providerItem'
+import Location from "../enums/location";
 
 export default class Base {
 
@@ -58,6 +59,10 @@ export default class Base {
         } while (this.withPages && page < 20);
 
         return result;
+    }
+
+    static isApplicable(location: string): boolean {
+        return location === Location.BUDAPEST;
     }
 
     getUrl(page: number): string {
