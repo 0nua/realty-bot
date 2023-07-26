@@ -11,4 +11,11 @@ export default class Logger {
             await Logger.telegraf.telegram.sendMessage(Logger.chatId, `Error occurred: ${error.message}`);
         }
     }
+
+    static debug(message: string) {
+        if (process.env.APP_ENV !== 'offline') {
+            return;
+        }
+        console.log(message);
+    }
 }

@@ -1,4 +1,5 @@
 import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
+import Logger from "./logger";
 
 interface Response {
     data: any,
@@ -39,11 +40,6 @@ export default class RequestWrapper {
     }
 
     static log(request: object, response: object) {
-        if (process.env.APP_ENV !== 'offline') {
-            return;
-        }
-        console.log(
-            `HTTP Request with payload ${JSON.stringify(request)} response ${JSON.stringify(response)}`
-        );
+        Logger.debug(`HTTP Request with payload ${JSON.stringify(request)} response ${JSON.stringify(response)}`);
     }
 }
