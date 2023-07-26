@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Logger from "./logger";
+import RequestWrapper from "./requestWrapper";
 
 export default class YaDisk {
     config: {
@@ -20,9 +21,9 @@ export default class YaDisk {
 
     async get(path: string, def: any = {}): Promise<any> {
         try {
-            let response = await axios.get(
+            let response = await RequestWrapper.request(
                 `https://cloud-api.yandex.net/v1/disk/resources/download?path=${this.getEnvPath(path)}`,
-                this.config,
+                this.config
             );
             let content = await this.download(response.data.href);
             return JSON.parse(content);
@@ -48,12 +49,12 @@ export default class YaDisk {
 
     async update(path: string, data: object): Promise<boolean> {
         try {
-            let upload = await axios.get(
+            let upload = await RequestWrapper.request(
                 `https://cloud-api.yandex.net/v1/disk/resources/upload?overwrite=true&path=${this.getEnvPath(path)}`,
-                this.config,
+                this.config
             );
 
-            await axios.put(upload.data.href, JSON.stringify(data));
+            await RequestWrapper.request(upload.data.href, {method: 'PUT', data: data});
 
             let status = 'unknown';
             let limit = 0;
@@ -62,10 +63,12 @@ export default class YaDisk {
                     throw new Error('Operation check limit reached');
                     break;
                 }
-                let response = await axios.get(
+
+                let response = await RequestWrapper.request(
                     `https://cloud-api.yandex.net/v1/disk/operations/${upload.data.operation_id}`,
-                    this.config,
+                    this.config
                 );
+
                 status = response.data.status ?? status;
                 limit++;
             }
@@ -79,10 +82,11 @@ export default class YaDisk {
 
     async delete(path: string): Promise<boolean> {
         try {
-            let response = await axios.delete(
+            let response = await RequestWrapper.request(
                 `https://cloud-api.yandex.net/v1/disk/resources?path=${this.getEnvPath(path)}`,
-                this.config,
+                {...this.config, method: 'DELETE'}
             );
+
             return response.status === 204;
         } catch (err: any) {
             let status = err.response && err.response.status
