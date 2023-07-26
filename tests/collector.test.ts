@@ -24,11 +24,11 @@ test('Links with filters', () => {
 });
 
 test('Links with new location', () => {
-    let filters: Filters = {
+    let filters = new Filters({
         flat: ["max-500", "pets", "newly", "room-3", "condi", "furnished"],
         house: ["price-150", "max-250", "pets", "condi", "furnished"],
         location: 'beograd'
-    };
+    });
 
     let urls = new Collector(367825282, filters).getUrls();
 
