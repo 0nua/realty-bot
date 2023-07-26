@@ -210,6 +210,7 @@ export default class TgBot {
             let name = ctx.match[2];
 
             let settings = await this.settings.processFilter(ctx.chat.id, type, name);
+            //TODO: not update without changes
             await this.settings.update(settings, ctx.chat.id);
 
             if (settings.hasOwnProperty(ctx.chat.id) === false) {
