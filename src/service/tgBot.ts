@@ -210,10 +210,11 @@ export default class TgBot {
             let name = ctx.match[2];
 
             let settings = await this.settings.processFilter(ctx.chat.id, type, name);
-
             await this.settings.update(settings, ctx.chat.id);
 
-            await this.deleteCollection(ctx.chat.id);
+            if (settings.hasOwnProperty(ctx.chat.id) === false) {
+                await this.deleteCollection(ctx.chat.id);
+            }
 
             await ctx.editMessageText(
                 `What kind of realty do you need in ${StringHelper.ucFirst(name)}?`,
