@@ -9,7 +9,7 @@ import CollectorDataInterface from '../interfaces/collectorData';
 import Filters from '../dto/filters';
 import Logger from './logger';
 import Location from "../enums/location";
-import CityExpert from "../provider/serbia/cityexpert";
+import Halooglasi from "../provider/serbia/halooglasi";
 
 export default class Collector {
 
@@ -26,12 +26,6 @@ export default class Collector {
             this.providers.push(new RentWithPaws());
         }
 
-        let providers = [
-            Ingatlan,
-            Alberlet,
-            CityExpert
-        ];
-
         for (let type in {flat: filters.flat, house: filters.house}) {
             let values = [...filters[type]];
             if (values.length === 0) {
@@ -40,10 +34,14 @@ export default class Collector {
             values.push(type);
             values.push(`location-${filters.location}`);
 
-            providers.forEach((Provider) => {
-               if (Provider.isApplicable(filters.location) === false) {
-                   return;
-               }
+            [
+                Ingatlan,
+                Alberlet,
+                Halooglasi
+            ].forEach((Provider) => {
+                if (Provider.isApplicable(filters.location) === false) {
+                    return;
+                }
                 this.providers.push(new Provider(values));
             });
         }

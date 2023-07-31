@@ -24,7 +24,6 @@ export default {
         pets: 'With pets',
         condi: 'Air conditioning',
         furnished: 'Furnished',
-        balcony: 'Balcony',
         "room-2": 'Min. 2 rooms',
         "room-3": 'Min. 3 rooms',
         "room-4": 'Min. 4 rooms',

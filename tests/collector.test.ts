@@ -3,6 +3,8 @@ import Filters from "../src/dto/filters";
 import {RentWithPaws} from "../src/provider/rentWithPaws";
 import {Ingatlan} from "../src/provider/ingatlan";
 import crypto from "crypto";
+import Halooglasi from "../src/provider/serbia/halooglasi";
+import Location from "../src/enums/location";
 
 test('Links with filters', () => {
     let filters = new Filters({
@@ -19,6 +21,23 @@ test('Links with filters', () => {
             'https://en.alberlet.hu/kiado_alberlet/page:1/haziallat-engedelyezve:igen/ujszeru:igen/szoba:3-x/klima:igen/berendezes:2/ingatlan-tipus:lakas/megye:budapest/berleti-dij:0-500-ezer-ft/limit:100',
             'https://ingatlan.com/szukites/kiado+kisallat-hozhato+van-legkondi+butorozott+haz+budapest+havi-150-250-ezer-Ft?page=1',
             'https://en.alberlet.hu/kiado_alberlet/page:1/haziallat-engedelyezve:igen/klima:igen/berendezes:2/ingatlan-tipus:haz/megye:budapest/berleti-dij:150-250-ezer-ft/limit:100'
+        ]
+    );
+});
+
+test('Serbian links with filters', () => {
+    let filters = new Filters({
+        flat: ["max-500", "pets", "newly", "room-3", "condi", "furnished"],
+        house: ["price-150", "max-250", "pets", "condi", "furnished"],
+        location: Location.BELGRADE
+    });
+
+    let urls = new Collector(367825282, filters).getUrls();
+
+    expect(urls.length).toBe(2);
+    expect(urls).toEqual([
+            "https://www.halooglasi.com/nekretnine/izdavanje-stanova/beograd?cena_d_to=500&dodatno_id_ls=12000009&tip_objekta_id_l=387235&broj_soba_order_i_from=3&ostalo_id_ls=12100002&namestenost_id_l=562&page=1",
+            "https://www.halooglasi.com/nekretnine/izdavanje-kuca/beograd?cena_d_from=150&cena_d_to=250&dodatno_id_ls=12000009&ostalo_id_ls=12100002&namestenost_id_l=562&page=1"
         ]
     );
 });
@@ -86,5 +105,19 @@ test('Test ingatlan change url', async () => {
         expect(item.id.includes('realestatehungary')).toBeTruthy();
         expect(item.url).toBeDefined()
         expect(item.url.includes('ingatlan')).toBeTruthy();
+    }
+});
+
+test('Halooglasi provider', async () => {
+    let provider = new Halooglasi(['flat', 'location']);
+    provider.withPages = false;
+
+    let data = await provider.getData();
+    expect(typeof data === 'object').toBeTruthy();
+    for (let hash in data) {
+        let item = data[hash];
+
+        expect(hash).toBe(crypto.createHash('md5').update(item.id).digest('hex'));
+        expect(item.id.includes('www.halooglasi.com')).toBeTruthy();
     }
 });
