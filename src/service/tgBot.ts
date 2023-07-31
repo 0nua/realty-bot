@@ -10,6 +10,7 @@ import DbQueue from "./dbQueue";
 import {QueueServiceInterface} from "../interfaces/queue";
 import Location from "../enums/location";
 import StringHelper from "../helpers/stringHelper";
+import keyboardHelper from "../helpers/keyboardHelper";
 
 export default class TgBot {
 
@@ -103,8 +104,9 @@ export default class TgBot {
     getFiltersKeyboard(type: string, filters: Filters): any {
 
         let typeFilters = filters[type] ?? [];
+        let location = filters.location;
 
-        let buttons = {...this.buttons};
+        let buttons = Object.assign({}, keyboardHelper[location]);
         if (type !== 'flat') {
             delete buttons['balcony'];
         }
