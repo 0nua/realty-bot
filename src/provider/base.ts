@@ -65,7 +65,7 @@ export default class Base {
         return location === Location.BUDAPEST;
     }
 
-    getUrl(page: number): string {
+    getUrl(page: number, humanLink?: boolean): string {
         throw new Error('Not implemented');
     }
 

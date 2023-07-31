@@ -10,6 +10,7 @@ import Filters from '../dto/filters';
 import Logger from './logger';
 import Location from "../enums/location";
 import Halooglasi from "../provider/serbia/halooglasi";
+import CityExpert from "../provider/serbia/cityexpert";
 
 export default class Collector {
 
@@ -37,7 +38,8 @@ export default class Collector {
             [
                 Ingatlan,
                 Alberlet,
-                Halooglasi
+                Halooglasi,
+                CityExpert
             ].forEach((Provider) => {
                 if (Provider.isApplicable(filters.location) === false) {
                     return;
@@ -94,7 +96,7 @@ export default class Collector {
 
     getUrls(): string[] {
         return this.providers.map((provider: Base) => {
-            return provider.getUrl(1);
+            return provider.getUrl(1, true);
         });
     }
 }
