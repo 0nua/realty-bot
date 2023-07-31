@@ -83,3 +83,11 @@ test('Test apply one type filter', async () => {
 
     expect(filters.flat).toEqual(['price-200']);
 });
+
+test('Test add location', async() => {
+    let mock = getMockWithFilters(new Filters({flat: [], house: []}));
+    let updated = await mock.processFilter(1, 'location', 'budapest');
+
+    expect(updated.hasOwnProperty(1)).toBeTruthy();
+    expect(updated[1].filters.location).toEqual('budapest');
+});

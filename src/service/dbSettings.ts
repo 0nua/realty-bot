@@ -92,7 +92,7 @@ export default class DbSettings implements SettingsServiceInterface {
 
     async processFilter(chatId: number, type: string, name: string): Promise<SettingsInterface> {
         let filters = await this.applyFilter(chatId, type, name);
-        if (filters.isEmpty()) {
+        if (type !== 'location' && filters.isEmpty()) {
             return {};
         }
 
