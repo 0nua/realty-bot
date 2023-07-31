@@ -192,11 +192,16 @@ export default class TgBot {
         }
 
         this.bot.command(['start', 'configure'], ctx => {
+            let locations = Object.keys(Location);
+            //TODO: do not forget to remove
+            if (ctx.chat.id !== Number.parseInt(process.env.ADMIN_CHAT_ID ?? '0')) {
+                locations = [Location.BUDAPEST];
+            }
             ctx.reply(
                 'What is your location?',
                 Markup.inlineKeyboard(
                     [
-                        Object.keys(Location).map((key) => {
+                        locations.map((key) => {
                             return Markup.button.callback(StringHelper.ucFirst(Location[key]), `location-${Location[key]}`);
                         }),
                         [
