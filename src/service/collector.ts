@@ -9,6 +9,7 @@ import CollectorDataInterface from '../interfaces/collectorData';
 import Filters from '../dto/filters';
 import Logger from './logger';
 import Location from "../enums/location";
+import CityExpert from "../provider/serbia/cityexpert";
 
 export default class Collector {
 
@@ -27,7 +28,8 @@ export default class Collector {
 
         let providers = [
             Ingatlan,
-            Alberlet
+            Alberlet,
+            CityExpert
         ];
 
         for (let type in {flat: filters.flat, house: filters.house}) {
@@ -36,7 +38,7 @@ export default class Collector {
                 continue;
             }
             values.push(type);
-            values.push('location');
+            values.push(`location-${filters.location}`);
 
             providers.forEach((Provider) => {
                if (Provider.isApplicable(filters.location) === false) {

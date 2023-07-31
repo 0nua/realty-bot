@@ -19,7 +19,6 @@ export class Alberlet extends Base {
             pets: 'haziallat-engedelyezve:igen',
             house: 'ingatlan-tipus:haz',
             flat: 'ingatlan-tipus:lakas',
-            location: 'megye:budapest',
             balcony: 'erkely:igen',
             newly: 'ujszeru:igen',
             furnished: 'berendezes:2',
@@ -42,6 +41,8 @@ export class Alberlet extends Base {
                             return null;
                         case 'room':
                             return `szoba:${value}-x`;
+                        case 'location':
+                            return `megye:${value}`;
                     }
                 }
 

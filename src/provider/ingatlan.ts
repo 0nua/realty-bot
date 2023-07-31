@@ -20,7 +20,6 @@ export class Ingatlan extends Base {
             house: 'haz',
             flat: 'lakas',
             newly: 'uj-epitesu',
-            location: 'budapest',
             balcony: '1-m2erkely-felett',
             furnished: 'butorozott',
             condi: 'van-legkondi'
@@ -42,6 +41,8 @@ export class Ingatlan extends Base {
                             return null;
                         case 'room':
                             return `${value}-szoba-felett`;
+                        case 'location':
+                            return value;
                     }
                 }
                 return filterMap[filter] || null;
