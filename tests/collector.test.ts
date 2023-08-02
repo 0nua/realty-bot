@@ -3,6 +3,9 @@ import Filters from "../src/dto/filters";
 import {RentWithPaws} from "../src/provider/rentWithPaws";
 import {Ingatlan} from "../src/provider/ingatlan";
 import crypto from "crypto";
+import Halooglasi from "../src/provider/serbia/halooglasi";
+import Location from "../src/enums/location";
+import CityExpert from "../src/provider/serbia/cityexpert";
 
 test('Links with filters', () => {
     let filters = new Filters({
@@ -23,7 +26,26 @@ test('Links with filters', () => {
     );
 });
 
-test('Links with new location', () => {
+test('Serbian links with filters', () => {
+    let filters = new Filters({
+        flat: ["max-500", "pets", "newly", "room-3", "condi", "furnished"],
+        house: ["price-150", "max-250", "pets", "condi", "furnished"],
+        location: Location.BELGRADE
+    });
+
+    let urls = new Collector(367825282, filters).getUrls();
+
+    expect(urls.length).toBe(4);
+    expect(urls).toEqual([
+            "https://www.halooglasi.com/nekretnine/izdavanje-stanova/beograd?cena_d_to=500&dodatno_id_ls=12000009&tip_objekta_id_l=387235&broj_soba_order_i_from=3&ostalo_id_ls=12100002&namestenost_id_l=562&page=1",
+            "https://cityexpert.rs/en/properties-for-rent/belgrade?maxPrice=500&petsArray=1,2&yearOfConstruction=4,5&structure=3.0&furnishingArray=furAircon&furnished=1&ptId=1",
+            "https://www.halooglasi.com/nekretnine/izdavanje-kuca/beograd?cena_d_from=150&cena_d_to=250&dodatno_id_ls=12000009&ostalo_id_ls=12100002&namestenost_id_l=562&page=1",
+            "https://cityexpert.rs/en/properties-for-rent/belgrade?minPrice=150&maxPrice=250&petsArray=1,2&furnishingArray=furAircon&furnished=1&ptId=2"
+        ]
+    );
+});
+
+test('Links with unknown location', () => {
     let filters = new Filters({
         flat: ["max-500", "pets", "newly", "room-3", "condi", "furnished"],
         house: ["price-150", "max-250", "pets", "condi", "furnished"],
@@ -86,5 +108,33 @@ test('Test ingatlan change url', async () => {
         expect(item.id.includes('realestatehungary')).toBeTruthy();
         expect(item.url).toBeDefined()
         expect(item.url.includes('ingatlan')).toBeTruthy();
+    }
+});
+
+test('Test Halooglasi provider', async () => {
+    let provider = new Halooglasi(['flat', 'location']);
+    provider.withPages = false;
+
+    let data = await provider.getData();
+    expect(typeof data === 'object').toBeTruthy();
+    for (let hash in data) {
+        let item = data[hash];
+
+        expect(hash).toBe(crypto.createHash('md5').update(item.id).digest('hex'));
+        expect(item.id.includes('www.halooglasi.com')).toBeTruthy();
+    }
+});
+
+test('Test CityExpert provider', async () => {
+    let provider = new CityExpert(['flat', 'location-belgrade', 'price-100', 'pets']);
+    provider.withPages = false;
+
+    let data = await provider.getData();
+    expect(typeof data === 'object').toBeTruthy();
+    for (let hash in data) {
+        let item = data[hash];
+
+        expect(hash).toBe(crypto.createHash('md5').update(item.id).digest('hex'));
+        expect(item.id.includes('cityexpert.rs')).toBeTruthy();
     }
 });

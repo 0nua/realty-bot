@@ -10,6 +10,7 @@ import DbQueue from "./dbQueue";
 import {QueueServiceInterface} from "../interfaces/queue";
 import Location from "../enums/location";
 import StringHelper from "../helpers/stringHelper";
+import keyboardHelper from "../helpers/keyboardHelper";
 
 export default class TgBot {
 
@@ -103,8 +104,9 @@ export default class TgBot {
     getFiltersKeyboard(type: string, filters: Filters): any {
 
         let typeFilters = filters[type] ?? [];
+        let location = filters.location;
 
-        let buttons = {...this.buttons};
+        let buttons = Object.assign({}, keyboardHelper[location]);
         if (type !== 'flat') {
             delete buttons['balcony'];
         }
@@ -190,12 +192,17 @@ export default class TgBot {
         }
 
         this.bot.command(['start', 'configure'], ctx => {
+            let locations = Object.values(Location);
+            //TODO: do not forget to remove
+            if ([352086150, 367825282].includes(ctx.chat.id) === false) {
+                locations = [Location.BUDAPEST];
+            }
             ctx.reply(
                 'What is your location?',
                 Markup.inlineKeyboard(
                     [
-                        Object.keys(Location).map((key) => {
-                            return Markup.button.callback(StringHelper.ucFirst(Location[key]), `location-${Location[key]}`);
+                        locations.map((location) => {
+                            return Markup.button.callback(StringHelper.ucFirst(location), `location-${location}`);
                         }),
                         [
                             Markup.button.callback('Close', 'close')
