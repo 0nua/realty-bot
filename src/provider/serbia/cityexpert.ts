@@ -7,10 +7,16 @@ import ProviderItemInterface from "../../interfaces/providerItem";
 
 export default class CityExpert extends Base {
     filters: string[];
+    cities: {
+        [id: number]: string
+    };
 
     constructor(filters: string[]) {
         super();
 
+        this.cities = {
+            1: Location.BELGRADE
+        };
         this.filters = filters;
         this.withPages = true;
         this.limit = 30;
@@ -60,7 +66,7 @@ export default class CityExpert extends Base {
             flat: {ptId: [1]},
             balcony: {otherArray: ['adpTerrace']},
             newly: {yearOfConstruction: [4, 5]},
-            furnished: {funished: 1},
+            furnished: {furnished: 1},
             condi: {furnishingArray: ['furAircon']}
         };
 
@@ -81,7 +87,7 @@ export default class CityExpert extends Base {
                             filters['structure'] = [`${value}.0`];
                             return;
                         case 'location':
-                            filters['cityId'] = 1; //Belgrade
+                            filters['cityId'] = this.getCityIdByName(value);
                             return;
                     }
                 }
@@ -91,14 +97,20 @@ export default class CityExpert extends Base {
 
         if (humanLink) {
             let converted = [];
+            let city = null;
             for (let name in filters) {
                 let value = filters[name];
                 if (Array.isArray(value)) {
                     value = value.join(',');
                 }
+
+                if (name === 'cityId') {
+                    city = this.getCityById(filters['cityId']);
+                    continue;
+                }
                 converted.push(`${name}=${value}`);
             }
-            return `https://cityexpert.rs/en/properties-for-rent/belgrade?${converted.join('&')}`;
+            return `https://cityexpert.rs/en/properties-for-rent/${city}?${converted.join('&')}`;
         }
 
         filters = {
@@ -134,10 +146,17 @@ export default class CityExpert extends Base {
     }
 
     getCityById(id: number): string | null {
-        let cities = {
-            1: 'belgrade'
-        };
+        return this.cities[id] ?? null;
+    }
 
-        return cities[id] ?? null;
+    getCityIdByName(name: string): number | null {
+        for (let id in this.cities) {
+            let city = this.cities[id];
+            if (name === city) {
+                return Number.parseInt(id);
+            }
+        }
+
+        return null;
     }
 }
