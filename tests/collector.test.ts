@@ -38,9 +38,9 @@ test('Serbian links with filters', () => {
     expect(urls.length).toBe(4);
     expect(urls).toEqual([
             "https://www.halooglasi.com/nekretnine/izdavanje-stanova/beograd?cena_d_to=500&dodatno_id_ls=12000009&tip_objekta_id_l=387235&broj_soba_order_i_from=3&ostalo_id_ls=12100002&namestenost_id_l=562&page=1",
-            "https://cityexpert.rs/en/properties-for-rent/belgrade?maxPrice=500&petsArray=1,2&yearOfConstruction=4,5&structure=3.0&furnishingArray=furAircon&funished=1&ptId=1",
+            "https://cityexpert.rs/en/properties-for-rent/belgrade?maxPrice=500&petsArray=1,2&yearOfConstruction=4,5&structure=3.0&furnishingArray=furAircon&furnished=1&ptId=1",
             "https://www.halooglasi.com/nekretnine/izdavanje-kuca/beograd?cena_d_from=150&cena_d_to=250&dodatno_id_ls=12000009&ostalo_id_ls=12100002&namestenost_id_l=562&page=1",
-            "https://cityexpert.rs/en/properties-for-rent/belgrade?minPrice=150&maxPrice=250&petsArray=1,2&furnishingArray=furAircon&funished=1&ptId=2"
+            "https://cityexpert.rs/en/properties-for-rent/belgrade?minPrice=150&maxPrice=250&petsArray=1,2&furnishingArray=furAircon&furnished=1&ptId=2"
         ]
     );
 });
@@ -126,7 +126,7 @@ test('Test Halooglasi provider', async () => {
 });
 
 test('Test CityExpert provider', async () => {
-    let provider = new CityExpert(['flat', 'location-belgrad', 'price-100', 'pets']);
+    let provider = new CityExpert(['flat', 'location-belgrade', 'price-100', 'pets']);
     provider.withPages = false;
 
     let data = await provider.getData();
