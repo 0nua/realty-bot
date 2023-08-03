@@ -66,7 +66,7 @@ export default class CityExpert extends Base {
             flat: {ptId: [1]},
             balcony: {otherArray: ['adpTerrace']},
             newly: {yearOfConstruction: [4, 5]},
-            furnished: {furnished: 1},
+            furnished: {furnished: [1]},
             condi: {furnishingArray: ['furAircon']}
         };
 
