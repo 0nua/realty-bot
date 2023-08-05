@@ -61,7 +61,7 @@ export default class Halooglasi extends Base {
         return {
             id: `https://www.halooglasi.com${card.querySelector('.product-title > a').getAttribute('href')}`,
             price: card.querySelector('.central-feature i').text.trim(),
-            address: address.join('/'),
+            address: address.join(', '),
         }
     }
 
