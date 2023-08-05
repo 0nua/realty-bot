@@ -192,16 +192,11 @@ export default class TgBot {
         }
 
         this.bot.command(['start', 'configure'], ctx => {
-            let locations = Object.values(Location);
-            //TODO: do not forget to remove
-            if ([352086150, 367825282].includes(ctx.chat.id) === false) {
-                locations = [Location.BUDAPEST];
-            }
             ctx.reply(
                 'What is your location?',
                 Markup.inlineKeyboard(
                     [
-                        locations.map((location) => {
+                        Object.values(Location).map((location) => {
                             return Markup.button.callback(StringHelper.ucFirst(location), `location-${location}`);
                         }),
                         [
@@ -217,7 +212,7 @@ export default class TgBot {
             let name = ctx.match[2];
 
             let settings = await this.settings.processFilter(ctx.chat.id, type, name);
-            //TODO: not update without changes
+
             await this.settings.update(settings, ctx.chat.id);
 
             if (settings.hasOwnProperty(ctx.chat.id) === false) {
