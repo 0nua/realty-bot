@@ -11,10 +11,7 @@ export default class RequestWrapper {
 
     static config: object = {
         method: 'GET',
-        timeout: 10 * 1000,
-        headers: {
-            'User-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
-        }
+        timeout: 10 * 1000
     };
 
     static async request(url: string, config: object = {}, repeat: boolean = true): Promise<Response> {
@@ -31,6 +28,7 @@ export default class RequestWrapper {
             }
         } catch (err: any) {
             if (repeat) {
+                await new Promise(resolve => setTimeout(resolve, 0.5 * 1000));
                 return RequestWrapper.request(url, config, false);
             }
             err.message = `${err.message} (${url})`;
