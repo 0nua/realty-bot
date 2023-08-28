@@ -28,7 +28,7 @@ export default class RequestWrapper {
             }
         } catch (err: any) {
             if (repeat) {
-                await new Promise(resolve => setTimeout(resolve, 0.5 * 1000));
+                await new Promise(resolve => setTimeout(resolve, 2 * 1000));
                 return RequestWrapper.request(url, config, false);
             }
             err.message = `${err.message} (${url})`;
