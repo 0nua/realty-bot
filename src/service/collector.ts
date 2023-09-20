@@ -8,7 +8,6 @@ import ProviderItemInterface from '../interfaces/providerItem';
 import CollectorDataInterface from '../interfaces/collectorData';
 import Filters from '../dto/filters';
 import Logger from './logger';
-import Location from "../enums/location";
 import Halooglasi from "../provider/serbia/halooglasi";
 import CityExpert from "../provider/serbia/cityexpert";
 
@@ -41,7 +40,7 @@ export default class Collector {
                 Halooglasi,
                 CityExpert
             ].forEach((Provider) => {
-                if (Provider.isApplicable(filters.location) === false) {
+                if (!Provider.isApplicable(filters.location)) {
                     return;
                 }
                 this.providers.push(new Provider(values));
@@ -81,7 +80,7 @@ export default class Collector {
 
             collection.push(id);
 
-            if (firstTime === false) {
+            if (!firstTime) {
                 newest.push(result[id]);
             }
         }

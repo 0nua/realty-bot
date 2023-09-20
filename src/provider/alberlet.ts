@@ -11,7 +11,7 @@ export class Alberlet extends Base {
         this.filters = filters;
         this.selector = 'div.advert-data';
         this.withPages = true;
-        this.limit = 100;
+        this.limit = 50;
     }
 
     getUrl(page: number) {

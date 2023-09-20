@@ -1,4 +1,4 @@
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios from 'axios';
 import Logger from "./logger";
 
 interface Response {
@@ -11,7 +11,7 @@ export default class RequestWrapper {
 
     static config: object = {
         method: 'GET',
-        timeout: 10 * 1000
+        timeout: 15 * 1000
     };
 
     static async request(url: string, config: object = {}, repeat: boolean = true): Promise<Response> {
