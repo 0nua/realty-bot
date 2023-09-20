@@ -61,7 +61,6 @@ export default class YaDisk {
             while (status !== 'success') {
                 if (limit > 5) {
                     throw new Error('Operation check limit reached');
-                    break;
                 }
 
                 let response = await RequestWrapper.request(

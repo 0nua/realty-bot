@@ -1,7 +1,6 @@
 import Location from "../../enums/location";
 import Base from "../base";
 import RequestWrapper from "../../service/requestWrapper";
-import parser from "node-html-parser";
 import crypto from "crypto";
 import ProviderItemInterface from "../../interfaces/providerItem";
 

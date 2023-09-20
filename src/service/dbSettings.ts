@@ -1,7 +1,6 @@
 import DynamoDB from "./dynamodb";
 import {SettingsServiceInterface, SettingsInterface} from "../interfaces/settings";
 import Filters from '../dto/filters';
-import Location from "../enums/location";
 
 export default class DbSettings implements SettingsServiceInterface {
 

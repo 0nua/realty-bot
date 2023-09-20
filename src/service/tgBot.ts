@@ -3,7 +3,6 @@ import YaDisk from './yaDisk';
 import Collector from './collector';
 import {SettingsInterface, SettingsServiceInterface} from "../interfaces/settings";
 import Filters from '../dto/filters';
-import CollectorDataInterface from "../interfaces/collectorData";
 import Logger from "./logger";
 import DbSettings from "./dbSettings";
 import DbQueue from "./dbQueue";
@@ -215,7 +214,7 @@ export default class TgBot {
 
             await this.settings.update(settings, ctx.chat.id);
 
-            if (settings.hasOwnProperty(ctx.chat.id) === false) {
+            if (!settings.hasOwnProperty(ctx.chat.id)) {
                 await this.deleteCollection(ctx.chat.id);
             }
 
@@ -280,8 +279,6 @@ export default class TgBot {
 
         this.bot.command('about', ctx => {
             ctx.reply(
-                "I check updates on sites https://tappancsosotthon.hu, https://en.alberlet.hu and https://ingatlan.com" +
-                "\n\n" +
                 "Use command /configure for set up your filters. https://tappancsosotthon.hu does not have filters, " +
                 "so you will get all updates from it.\nFilter you have already selected will be marked by \"+\" symbol, " +
                 "tap again for remove" +
@@ -305,7 +302,7 @@ export default class TgBot {
             );
         });
 
-        this.bot.command('/error', async ctx => {
+        this.bot.command('/error', async () => {
             throw new Error('test');
         });
 

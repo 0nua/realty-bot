@@ -12,7 +12,7 @@ export default class DbQueue implements QueueServiceInterface {
     async process(): Promise<number> {
         let queue = await this.getQueue();
 
-        let chatId = await this.getChatId(queue);
+        let chatId = this.getChatId(queue);
 
         await this.updateQueue(chatId);
 
