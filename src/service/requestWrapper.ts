@@ -11,7 +11,10 @@ export default class RequestWrapper {
 
     static config: object = {
         method: 'GET',
-        timeout: 15 * 1000
+        timeout: 15 * 1000,
+        headers: {
+            'User-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'
+        }
     };
 
     static async request(url: string, config: object = {}, repeat: boolean = true): Promise<Response> {
