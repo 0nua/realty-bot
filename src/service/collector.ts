@@ -35,7 +35,7 @@ export default class Collector {
             values.push(`location-${filters.location}`);
 
             [
-                Ingatlan,
+                //Ingatlan,
                 Alberlet,
                 Halooglasi,
                 CityExpert

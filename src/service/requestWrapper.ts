@@ -22,9 +22,17 @@ class FetchError extends Error {
 
 export default class RequestWrapper {
     static async request(url: string, config: AxiosRequest = {}, repeat: boolean = true): Promise<Response> {
+        const headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8",
+            ...config.headers
+        };
+
         const request = {
             method: config.method ?? "GET",
-            headers: config.headers ?? undefined,
+            headers: headers,
             body: config.data ? JSON.stringify(config.data): undefined,
             signal: AbortSignal.timeout(config.timeout ?? DEFAULT_TIMEOUT)
         };
@@ -45,7 +53,7 @@ export default class RequestWrapper {
             }
 
             let data = await response.text();
-            try { data = JSON.parse(data); } catch (_) {}
+            try { data = JSON.parse(data    ); } catch (_) {}
 
             return {
                 data,
@@ -57,8 +65,7 @@ export default class RequestWrapper {
                 await new Promise(resolve => setTimeout(resolve, 2 * 1000));
                 return RequestWrapper.request(url, config, false);
             }
-            err.message = `${err.message} (${url})`;
-            RequestWrapper.log(request, {err: err.message});
+            RequestWrapper.log(request, {message: `${err.message} (${url})`});
             throw err;
         }
     }
