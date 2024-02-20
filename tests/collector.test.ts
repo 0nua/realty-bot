@@ -15,12 +15,12 @@ test('Links with filters', () => {
 
     let urls = new Collector(367825282, filters).getUrls();
 
-    expect(urls.length).toBe(3);
+    expect(urls.length).toBe(5);
     expect(urls).toEqual([
             'https://tappancsosotthon.hu/',
-            //'https://ingatlan.com/szukites/kiado+kisallat-hozhato+uj-epitesu+3-szoba-felett+van-legkondi+butorozott+lakas+budapest+havi-500-ezer-Ft-ig?page=1',
+            'https://ingatlan.com/lista/kiado+kisallat-hozhato+uj-epitesu+3-szoba-felett+van-legkondi+butorozott+lakas+budapest+havi-500-ezer-Ft-ig?page=1',
             'https://en.alberlet.hu/kiado_alberlet/page:1/haziallat-engedelyezve:igen/ujszeru:igen/szoba:3-x/klima:igen/berendezes:2/ingatlan-tipus:lakas/megye:budapest/berleti-dij:0-500-ezer-ft/limit:50',
-            //'https://ingatlan.com/szukites/kiado+kisallat-hozhato+van-legkondi+butorozott+haz+budapest+havi-150-250-ezer-Ft?page=1',
+            'https://ingatlan.com/lista/kiado+kisallat-hozhato+van-legkondi+butorozott+haz+budapest+havi-150-250-ezer-Ft?page=1',
             'https://en.alberlet.hu/kiado_alberlet/page:1/haziallat-engedelyezve:igen/klima:igen/berendezes:2/ingatlan-tipus:haz/megye:budapest/berleti-dij:150-250-ezer-ft/limit:50'
         ]
     );
@@ -92,24 +92,24 @@ test('Test collector data fetching', async () => {
     expect(data.result).toHaveProperty('hash');
 });
 
-// test('Test ingatlan change url', async () => {
-//     let provider = new Ingatlan(['flat', 'location']);
-//     provider.withPages = false;
-//
-//     let data = await provider.getData();
-//
-//     expect(typeof data === 'object').toBeTruthy();
-//     expect(Object.keys(data)).toHaveLength(20);
-//
-//     for (let hash in data) {
-//         let item = data[hash];
-//
-//         expect(hash).toBe(crypto.createHash('md5').update(item.id).digest('hex'));
-//         expect(item.id.includes('realestatehungary')).toBeTruthy();
-//         expect(item.url).toBeDefined()
-//         expect(item.url.includes('ingatlan')).toBeTruthy();
-//     }
-// });
+test('Test ingatlan change url', async () => {
+    let provider = new Ingatlan(['flat', 'location']);
+    provider.withPages = false;
+
+    let data = await provider.getData();
+
+    expect(typeof data === 'object').toBeTruthy();
+    expect(Object.keys(data)).toHaveLength(20);
+
+    for (let hash in data) {
+        let item = data[hash];
+
+        expect(hash).toBe(crypto.createHash('md5').update(item.id).digest('hex'));
+        expect(item.id.includes('realestatehungary')).toBeTruthy();
+        expect(item.url).toBeDefined()
+        expect(item.url.includes('ingatlan')).toBeTruthy();
+    }
+}, 30 * 1000);
 
 test('Test Halooglasi provider', async () => {
     let provider = new Halooglasi(['flat', 'location']);
@@ -123,7 +123,7 @@ test('Test Halooglasi provider', async () => {
         expect(hash).toBe(crypto.createHash('md5').update(item.id).digest('hex'));
         expect(item.id.includes('www.halooglasi.com')).toBeTruthy();
     }
-});
+}, 10 * 1000);
 
 test('Test CityExpert provider', async () => {
     let provider = new CityExpert(['flat', 'location-belgrade', 'price-100', 'pets']);
@@ -137,4 +137,4 @@ test('Test CityExpert provider', async () => {
         expect(hash).toBe(crypto.createHash('md5').update(item.id).digest('hex'));
         expect(item.id.includes('cityexpert.rs')).toBeTruthy();
     }
-});
+}, 10 * 1000);
