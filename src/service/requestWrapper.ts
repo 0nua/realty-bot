@@ -1,4 +1,9 @@
 import Logger from "./logger";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { Browser } from "puppeteer";
+
+const chromium = require("@sparticuz/chromium");
 
 const DEFAULT_TIMEOUT = 15 * 1000;
 
@@ -21,6 +26,8 @@ class FetchError extends Error {
 }
 
 export default class RequestWrapper {
+    static browser: Browser;
+
     static async request(url: string, config: AxiosRequest = {}, repeat: boolean = true): Promise<Response> {
         const headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
@@ -33,7 +40,7 @@ export default class RequestWrapper {
         const request = {
             method: config.method ?? "GET",
             headers: headers,
-            body: config.data ? JSON.stringify(config.data): undefined,
+            body: config.data ? JSON.stringify(config.data) : undefined,
             signal: AbortSignal.timeout(config.timeout ?? DEFAULT_TIMEOUT)
         };
 
@@ -53,7 +60,10 @@ export default class RequestWrapper {
             }
 
             let data = await response.text();
-            try { data = JSON.parse(data    ); } catch (_) {}
+            try {
+                data = JSON.parse(data);
+            } catch (_) {
+            }
 
             return {
                 data,
@@ -63,11 +73,37 @@ export default class RequestWrapper {
         } catch (err: any) {
             if (repeat) {
                 await new Promise(resolve => setTimeout(resolve, 2 * 1000));
-                return RequestWrapper.request(url, config, false);
+                return await RequestWrapper.request(url, config, false);
             }
             RequestWrapper.log(request, {message: `${err.message} (${url})`});
             throw err;
         }
+    }
+
+    static async getContent(url: string, timeout: number): Promise<string | undefined> {
+        if (!RequestWrapper.browser) {
+            RequestWrapper.browser = await puppeteer
+                .use(StealthPlugin())
+                .launch({
+                    args: chromium.args,
+                    defaultViewport: chromium.defaultViewport,
+                    executablePath: await chromium.executablePath(),
+                    headless: chromium.headless,
+                });
+        }
+
+        const page = await RequestWrapper.browser.newPage();
+        const response = await page.goto(url, {waitUntil: "load", timeout});
+        if (!response) {
+            RequestWrapper.log({url}, {message: `Cannot load url ${url}`});
+            return;
+        }
+
+        const content = await page.content();
+
+        await page.close();
+
+        return content;
     }
 
     static log(request: object, response: object) {

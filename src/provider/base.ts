@@ -28,12 +28,15 @@ export default class Base {
 
         do {
             let url = this.getUrl(page);
-            let response = await RequestWrapper.request(url, {timeout: this.timeout});
+            let content = await RequestWrapper.getContent(url, this.timeout);
+            if (!content) {
+                continue;
+            }
 
-            let dom = parser.parse(response.data);
+            let dom = parser.parse(content);
             listings = dom.querySelectorAll(this.selector);
 
-            log.push({url: url, count: listings.length, time: response.time});
+            log.push({url: url, count: listings.length});
 
             if (listings.length > 0) {
                 for (let index = 0; index < listings.length; index++) {

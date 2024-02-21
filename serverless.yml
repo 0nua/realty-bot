@@ -34,6 +34,7 @@ plugins:
     - serverless-dynamodb-local
     - serverless-offline
     - serverless-express
+    - serverless-bundle
 
 resources:
     - ${file(config/resources.yml)}
@@ -47,3 +48,6 @@ custom:
             - offline
         start:
             migrate: true
+    bundle:
+        forceInclude:
+            - @sparticuz/chromium

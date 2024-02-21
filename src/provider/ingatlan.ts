@@ -57,7 +57,7 @@ export class Ingatlan extends Base {
             filters.push(`havi-${min}-ezer-Ft-tol`);
         }
 
-        return `https://ingatlan.com/szukites/kiado+${filters.join('+')}?page=${page}`;
+        return `https://ingatlan.com/lista/kiado+${filters.join('+')}?page=${page}`;
     }
 
     parse(card: any): ProviderItemInterface {
